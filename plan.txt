@@ -1,0 +1,39 @@
+### Goal:
+  * Write an emailer micro-service that I can just git clone and deploy for any project in the future. 
+
+### Specifications:
+  * Written in typescript (to practice TS skills + increased error detection if sharing publically).
+  * Can be called from any trusted endpoint
+    * make trusted_endpoints part of .env file
+  * Takes in 
+  
+  
+ ### Plan:
+   * Use nodemailer.js to send emails
+   * Store all auth info in .env 
+   * Take in just one object as a parameter
+	* obj = { 
+		"to": [list of recipients],
+		"from": "sender@temp.ca",
+		"cc": None (optional parameter)
+		"subject": "subject line",
+		"body": "HTML document"
+	}
+
+
+### Features:
+* SMTP Setup
+  * Authentication (.env) //DONE
+* Security
+  * Input validation & sanitization (for email address, subject line, etc.)
+  * Rate limiting
+  * encryption (TLS/SSL)
+  * Spoofing prevention (SPF, DKIM, DMARC) to prevent being marked as spam
+* Reliability / Scalability
+  * Retry logic for dealing with SMTP outages
+  * Queue system (Redis + Bull, Kue)
+  * Logging (for success monitoring)
+* Error handling
+* Auth / Access control
+  * JWT and API keys for access control
+  * CORS / CSRF
