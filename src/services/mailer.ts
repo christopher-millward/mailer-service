@@ -1,6 +1,6 @@
 import nodemailer, { Transporter } from 'nodemailer';
 import { config } from '../config/env';
-import {MailOptions} from '../interfaces/mailerInterfaces';
+import {MailOptions} from '../schema/mailerInterfaces';
 
 /**
  * @class MailerService

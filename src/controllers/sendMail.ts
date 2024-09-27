@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { mailerService } from '../services/mailer';
-import { MailOptions } from '../interfaces/mailerInterfaces';
+import { MailOptions } from '../schema/mailerInterfaces';
 
 /**
  * @description Sends an email with the provided details.

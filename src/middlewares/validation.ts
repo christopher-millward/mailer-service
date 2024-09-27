@@ -3,12 +3,12 @@ import { Request, Response, NextFunction } from 'express';
 
 /**
  * @description Validation rules for the email data.
- * @param {string} to Checks if the recipient email address is valid.
- * @param {string} subject Ensures the subject is not empty.
- * @param {string} text Ensures the message is not empty and sanitizes it.
+ * @param {string} to - Checks if the recipient email address is valid.
+ * @param {string} subject - Ensures the subject is not empty.
+ * @param {string} text - Ensures the message is not empty and sanitizes it.
  */
 export const mailValidationRules: ValidationChain[] = [
-  check('to').isEmail().withMessage('Invalid email address'),
+  check('to').isEmail().withMessage('Invalid email address').escape(),
   check('subject').notEmpty().withMessage('Subject cannot be empty').escape(),
   check('text').notEmpty().withMessage('Message cannot be empty').escape(),
 ];
@@ -27,3 +27,4 @@ export const validateRequest = (req: Request, res: Response, next: NextFunction)
   }
   next();
 };
+
