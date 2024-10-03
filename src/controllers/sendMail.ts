@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { mailerService } from '../services/mailer';
-import { MailOptions } from '../schema/mailerInterfaces';
+import { MailOptions } from '../schema/mailOptions';
 
 /**
  * @description Sends an email with the provided details.
@@ -9,12 +9,12 @@ import { MailOptions } from '../schema/mailerInterfaces';
  * @returns {Promise<void>} Sends a response indicating success or failure of the email sending operation.
  */
 export const sendEmail = async (req: Request<{}, MailOptions>, res: Response) => {
-  const { to, subject, text, html }: MailOptions = req.body;
+    const options: MailOptions = req.body;
 
-  try {
-    await mailerService.sendEmail({ to, subject, text, html });
-    res.status(200).send("Email sent successfully");
-  } catch (error) {
-    res.status(500).send("Failed to send email");
-  }
+    try {
+        await mailerService.sendEmail(options);
+        res.status(200).send("Email sent successfully");
+    } catch (error) {
+        res.status(500).send("Failed to send email");
+    }
 };

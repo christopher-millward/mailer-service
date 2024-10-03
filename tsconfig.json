@@ -1,12 +1,12 @@
 {
-  "compilerOptions": {
+"compilerOptions": {
     "target": "ES6",
     "module": "commonjs",
     "outDir": "./dist",
     "rootDir": "./src",
     "strict": true,
     "esModuleInterop": true
-  },
-  "include": ["src/**/*.ts"],
-  "exclude": ["node_modules"]
+},
+"include": ["src/**/*.ts", "src/schema/mailOptions.ts"],
+"exclude": ["node_modules"]
 }

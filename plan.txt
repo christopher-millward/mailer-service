@@ -1,11 +1,40 @@
 ### Goal:
-  * Write an emailer micro-service that I can just git clone and deploy for any project in the future. 
+	* Write an emailer micro-service that I can just git clone and deploy for any project in the future. 
+
+### Functionality:
+	* Accepts a single POST request and will fire off the email from there.
+	* Validates Source (only my sources)
+		* CORS middleware
+	* Protects against attacks
+		* ddos (express-rate-limit for rate limiting; body-parses with limits to cap request payload size.)
+		* XSS injection 
+			* xss-clean to sanitize input
+			* helmet for response headers
+			* Don't use .escape() on html field! 
+				* use sanitize-html to sanitize html field
+		* brute force auth keys (express-rate-limit to block repeated attempts after a threshold)
+		* general Security (helmet headers to responses)
+	* encryption? 
+		* enforce HTTPS protocol (helmet's HSTS settings)
+		* SSL certificates (Let's Encrypt)
+		* use express.json() to deserialize incoming JSON 
+	* Formats emails such that they will not end up in junk (spoofing prevention)
+		* use multer to handle attachments!
+	* Handles high volume (queuing feature)
+	* Retry logic (for downtime/ failures)
+	* Logging and monitoring
+		* winston.js for logging 
+	* Accepts attachments as Buffers -> need to install multer to parse all incoming data as a Buffer?
+	
+	
 
 ### Specifications:
-  * Written in typescript (to practice TS skills + increased error detection if sharing publically).
-  * Can be called from any trusted endpoint
+	* Written in typescript (to practice TS skills + increased error detection if sharing publically).
+	* Can be called from any trusted endpoint
     * make trusted_endpoints part of .env file
-  * Takes in 
+	* Takes in standard body argument
+	* Use SMTP protocol
+	* Thorough README file that explains a simple clone + configure .env file and you're good to go. 
   
   
  ### Plan:
@@ -23,7 +52,7 @@
 
 ### Features:
 * SMTP Setup
-  * Authentication (.env) //DONE
+  * Login (.env) //DONE
 * Security
   * Input validation & sanitization (for email address, subject line, etc.)
   * Rate limiting
@@ -35,5 +64,9 @@
   * Logging (for success monitoring)
 * Error handling
 * Auth / Access control
-  * JWT and API keys for access control
-  * CORS / CSRF
+  * JWT or API keys to limit trusted origins from other servers.
+  * CORS to limit trusted origins from the browser
+  
+
+
+* use Helmet for response headers to prevent XSS attacks

@@ -26,6 +26,10 @@ const helmetConfig = helmet({
     xssFilter: true, // Enable XSS filter
     noSniff: true, // Disable MIME type sniffing
     frameguard: { action: 'deny' }, // Prevent clickjacking by not allowing the page to be loaded in a frame
+    strictTransportSecurity:{
+        maxAge:3600*24*30, // 30 days
+        preload:true
+    }
 });
 
 /**
@@ -38,5 +42,5 @@ const helmetConfig = helmet({
  * @returns {void} Passes control to the next middleware or route handler.
  */
 export const httpHeaders = (req: Request, res: Response, next: NextFunction) => {
-  helmetConfig(req, res, next);
+    helmetConfig(req, res, next);
 };

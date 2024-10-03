@@ -7,6 +7,8 @@ import { config } from './config/env';
 // Middleware Imports
 import { httpHeaders } from './middlewares/httpSecurity';
 import { apiKeyAuth } from './middlewares/auth';
+import { corsPolicy } from './middlewares/corsConfig';
+import { enforceHttps } from './middlewares/enforceHttps';
 
 // Route Imports
 import mailRoutes from './routes/mailRoutes';
@@ -19,13 +21,15 @@ const PORT: number = config.port;
 app.use(httpHeaders);
 app.use(express.json());
 app.use(apiKeyAuth);
+app.use(corsPolicy);
+app.use(enforceHttps);
 
 // Route Setup
 app.use('/mail', mailRoutes);
 
 // Start Server
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+    console.log(`Server is running on port ${PORT}`);
 });
 
 // Export the Express API
