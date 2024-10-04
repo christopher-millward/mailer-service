@@ -2,7 +2,8 @@ import { Request, Response, NextFunction } from 'express';
 import { config } from '../config/env';
 
 /**
- * @description Middleware to enforce HTTPS for incoming requests.
+ * @description Middleware to enforce HTTPS for incoming requests. Only time we're OK with unsecure
+ *              requests is during development, from localhost.
  * @param {Request} req - Express request object.
  * @param {Response} res - Express response object.
  * @param {NextFunction} next - Express next middleware function.

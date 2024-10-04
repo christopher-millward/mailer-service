@@ -1,36 +1,26 @@
 import { Request, Response, NextFunction } from 'express';
-import helmet from 'helmet';
+import helmet, { HelmetOptions } from 'helmet';
 /**
  * @description Helmet configuration for securing the application by setting various HTTP headers.
  * It includes protections against XSS, Clickjacking, and MIME type sniffing.
  * Content Security Policy (CSP) restricts resource loading from specified sources.
- * 
- * - XSS protection is enabled via the legacy XSS filter.
- * - MIME type sniffing is disabled to prevent browsers from interpreting files incorrectly.
- * - Frameguard is set to deny to prevent Clickjacking attacks by disallowing the page in frames.
  */
 const helmetConfig = helmet({
     contentSecurityPolicy: {
-        directives: {
-            defaultSrc: ["'self'"],
-            scriptSrc: ["'self'"],
+        directives: { //changing some of the defaults to really restrict
             styleSrc: ["'self'"],
-            imgSrc: ["'self'", 'data:'],
+            imgSrc: ["'self'"],
             connectSrc: ["'self'"],
-            fontSrc: ["'self'"],
-            objectSrc: ["'none'"],
             mediaSrc: ["'self'"],
             frameSrc: ["'none'"],
         },
     },
-    xssFilter: true, // Enable XSS filter
-    noSniff: true, // Disable MIME type sniffing
-    frameguard: { action: 'deny' }, // Prevent clickjacking by not allowing the page to be loaded in a frame
-    strictTransportSecurity:{
-        maxAge:3600*24*30, // 30 days
+    xFrameOptions: { action: 'deny' }, // Prevent clickjacking by not allowing the page to be loaded in a frame
+    strictTransportSecurity:{   //enforce HTTPS
+        maxAge:3600*24*365, // 365 days
         preload:true
     }
-});
+} as HelmetOptions);
 
 /**
  * @description Custom middleware function to help secure the application from common web vulnerabilities.
