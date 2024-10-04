@@ -6,7 +6,7 @@ import { config } from './config/env';
 
 // Middleware Imports
 import { httpHeaders } from './middlewares/httpSecurity';
-import { apiKeyAuth } from './middlewares/auth';
+import { apiKeyAuth } from './middlewares/apiKeyAuth';
 import { corsPolicy } from './middlewares/corsConfig';
 import { enforceHttps } from './middlewares/enforceHttps';
 

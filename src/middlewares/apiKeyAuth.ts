@@ -10,13 +10,16 @@ import { config } from '../config/env';
  * @returns {void} - Sends an unauthorized response if the API key is incorrect, otherwise calls the next middleware.
  */
 export const apiKeyAuth = (req: Request, res: Response, next: NextFunction): void => {
-const apiKey = req.headers['x-api-key'] as string | undefined;
+   
+    const apiKey = req.headers['x-api-key'] as string | undefined;
+    const allowedKeys: string[] = config.apiKeys;
 
-if (!apiKey || apiKey !== config.apiKey) {
-    // Return a response if authentication fails
-    res.status(401).json({ message: 'Unauthorized' });
-    return; 
-}
-// Call the next middleware if authentication succeeds
-next();
+    if (apiKey && allowedKeys.includes(apiKey)) {
+        // Call the next middleware if authentication succeeds
+        next();
+    }else{
+        // Return a response if authentication fails
+        res.status(401).json({ message: 'Unauthorized access.' });
+        return; 
+    }  
 };

@@ -1,8 +1,8 @@
-import { enforceHttps } from './enforceHttps';
+import { enforceHttps } from '../../middlewares/enforceHttps';
 import { Request, Response, NextFunction } from 'express';
 
 // Mock the config
-jest.mock('../config/env', () => ({
+jest.mock('../../config/env', () => ({
     config: {
         environment: 'production', // Default mock for production, will override in specific tests
     },
@@ -56,7 +56,7 @@ describe('enforceHttps Middleware', () => {
 
     // Use-case 3: HTTPS request in development
     it('should call next() for HTTPS requests in development', () => {
-        jest.mocked(require('../config/env').config).environment = 'development';
+        jest.mocked(require('../../config/env').config).environment = 'development';
         const req = mockRequest(true, 'localhost:3000');
         const res = mockResponse();
 
@@ -68,7 +68,7 @@ describe('enforceHttps Middleware', () => {
 
     // Use-case 4: HTTP request from localhost in development
     it('should call next() for HTTP requests from localhost in development', () => {
-        jest.mocked(require('../config/env').config).environment = 'development';
+        jest.mocked(require('../../config/env').config).environment = 'development';
         const req = mockRequest(false, 'localhost:3000');
         const res = mockResponse();
 
@@ -80,7 +80,7 @@ describe('enforceHttps Middleware', () => {
 
     // Use-case 5: HTTP request in development (non-localhost)
     it('should redirect to HTTPS for HTTP requests from non-localhost in development', () => {
-        jest.mocked(require('../config/env').config).environment = 'development';
+        jest.mocked(require('../../config/env').config).environment = 'development';
         const req = mockRequest(false, 'www.example.com');
         const res = mockResponse();
 
