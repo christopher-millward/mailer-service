@@ -54,19 +54,19 @@
 * SMTP Setup
   * Login (.env) //DONE
 * Security
-  * Input validation & sanitization (for email address, subject line, etc.)
-  * Rate limiting
-  * encryption (TLS/SSL)
+  * Input validation & sanitization (for email address, subject line, etc.)	//DONE
+  * Rate limiting	//DONE
+  * encryption (TLS/SSL)	//DONE
   * Spoofing prevention (SPF, DKIM, DMARC) to prevent being marked as spam
 * Reliability / Scalability
   * Retry logic for dealing with SMTP outages
   * Queue system (Redis + Bull, Kue)
-  * Logging (for success monitoring)
+  * Logging (for success monitoring)	// DONE
 * Error handling
 * Auth / Access control
-  * JWT or API keys to limit trusted origins from other servers.
-  * CORS to limit trusted origins from the browser
+  * JWT or API keys to limit trusted origins from other servers.	//DONE
+  * CORS to limit trusted origins from the browser	//DONE
   
 
 
-* use Helmet for response headers to prevent XSS attacks
+* use Helmet for response headers to prevent XSS attacks	//DONE

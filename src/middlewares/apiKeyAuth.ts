@@ -2,8 +2,8 @@ import { Request, Response, NextFunction } from 'express';
 import { config } from '../config/env';
 
 /**
- * @function apiKeyAuth
- * @description Middleware to authenticate requests using an API key.
+ * @description Middleware to authenticate requests using an API key. This will be used when a
+ *              request comes from a server.
  * @param {Request} req - Express Request object.
  * @param {Response} res - Express Response object.
  * @param {NextFunction} next - Express NextFunction to move to the next middleware.

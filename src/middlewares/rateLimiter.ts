@@ -1,9 +1,18 @@
 import rateLimit, { RateLimitRequestHandler } from 'express-rate-limit';
 import { Request, Response, NextFunction } from 'express';
+import { config } from '../config/env';
 
 /**
- * @description Middleware to apply rate limiting to the API. Limits the number of requests a client can make in a given time window.
- * @returns {rateLimit.RateLimitRequestHandler} Rate limiting middleware for the Express app.
+ * @description Configuration for the rate limiter. This one in particular is intended to be applied 
+ *              to one specific route. 
+ * 
+ *              Note:   This middleware uses req.ip to determine IP address. If this API is hosted
+ *                      on a server that uses a reverse proxy for load balancing, you'll have to
+ *                      configure the index.ts file to set 'trust proxy' to `true` and trust the 
+ *                      ip as recommended by the server host. 
+ *                      See https://express-rate-limit.mintlify.app/guides/troubleshooting-proxy-issues
+ * 
+ * @link see https://www.npmjs.com/package/express-rate-limit for all options.S
  */
 const limiter: RateLimitRequestHandler = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes window (in ms)
@@ -11,6 +20,7 @@ const limiter: RateLimitRequestHandler = rateLimit({
     message: 'Too many requests from this IP, please try again later.',
     standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+    validate : { trustProxy: config.environment ==='test' ? false: true} // turn off warning in test environment.
 });
 
 /**

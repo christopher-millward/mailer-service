@@ -23,9 +23,7 @@ const helmetConfig = helmet({
 } as HelmetOptions);
 
 /**
- * @description Custom middleware function to help secure the application from common web vulnerabilities.
- * It applies all custom security configurations.
- * 
+ * @description Middleware to help secure the application from common web vulnerabilities. 
  * @param {Request} req - Express request object.
  * @param {Response} res - Express response object.
  * @param {NextFunction} next - Express next middleware function.

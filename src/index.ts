@@ -9,6 +9,7 @@ import { httpHeaders } from './middlewares/httpSecurity';
 import { apiKeyAuth } from './middlewares/apiKeyAuth';
 import { corsPolicy } from './middlewares/corsConfig';
 import { enforceHttps } from './middlewares/enforceHttps';
+import { logger } from './middlewares/logger';
 
 // Route Imports
 import mailRoutes from './routes/mailRoutes';
@@ -23,9 +24,23 @@ app.use(express.json());
 app.use(apiKeyAuth);
 app.use(corsPolicy);
 app.use(enforceHttps);
+app.use(logger)
 
 // Route Setup
 app.use('/mail', mailRoutes);
+
+//********* JUST FOR QUICK REST TESTING - DELETE PRIOR TO SHIPPING ***********/
+import {Request, Response} from 'express';
+import { mailOptionsValidationRules} from './middlewares/validation/mailOptionsValidation';
+import { attachmentValidationRules } from './middlewares/validation/attachmentValidation';
+import { validateRequest } from './middlewares/validation/validationRequest';
+app.post('/test', 
+    mailOptionsValidationRules,
+    // attachmentValidationRules,
+    validateRequest,(req: Request, res: Response) => {
+    res.status(200).json({ message: 'Success' });
+});
+//****************************************************************************/
 
 // Start Server
 app.listen(PORT, () => {
