@@ -5,10 +5,10 @@ import express, { Express } from 'express';
 import { config } from './config/env';
 
 // Middleware Imports
+import { logger } from './middlewares/logger';
 import { httpHeaders } from './middlewares/httpSecurity';
 import { authHandler } from './middlewares/auth/authHandler';
 import { enforceHttps } from './middlewares/enforceHttps';
-import { logger } from './middlewares/logger';
 
 // Route Imports
 import mailRoutes from './routes/mailRoutes';

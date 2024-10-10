@@ -17,10 +17,15 @@ export const corsPolicy = (req: Request, res: Response, next: NextFunction): voi
 
     const options: CorsOptions = {
         origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean | string) => void) => {
-            if (origin && allowedOrigins.includes(origin)) {
-                callback(null, origin); // Pass origin to callback to allow it
+            if (!origin) {
+                // If the origin header is not present (e.g., server-to-server requests), allow the request
+                callback(null, true);
+            } else if (allowedOrigins.includes(origin)) {
+                // If the origin is in the list of allowed origins, allow the request
+                callback(null, origin);
             } else {
-                callback(new Error('Untrusted Origin')); // Reject the origin with an error
+                // Otherwise, block the request with an error
+                callback(new Error('Untrusted Origin'));
             }
         },
         methods: ['POST', 'OPTIONS'],

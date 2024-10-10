@@ -58,12 +58,12 @@ describe('CORS Middleware', () => {
     });
 
     // Use-case 4: No Origin Header
-    it('should block access when no origin header is provided', async () => {
+    it('should pass to next middleware (apiKey auth) when no origin header is provided', async () => {
         const response = await request(app)
             .post('/test');
 
-        expect(response.status).toBe(403);
-        expect(response.body.message).toBe('Blocked by CORS policy.');
+        expect(response.status).toBe(200);
+        expect(response.body.message).toBe('Access granted');
     });
 
     // Use-case 5: Sending preflight request from valid origin

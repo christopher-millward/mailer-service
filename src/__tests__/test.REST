@@ -1,7 +1,7 @@
 ### Send Email Request
 POST http://localhost:3000/test HTTP/1.1
 Content-Type: application/json
-x-api-key: testAPIkey1
+# x-api-key: testAPIkey1
 # Origin: origin1.ca
 
 {
