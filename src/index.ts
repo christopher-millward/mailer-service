@@ -18,11 +18,11 @@ const app: Express = express();
 const PORT: number = config.port;
 
 // Middleware Setup
+app.use(logger)
 app.use(httpHeaders);
 app.use(express.json());
 app.use(authHandler);
 app.use(enforceHttps);
-app.use(logger)
 
 // Route Setup
 app.use('/mail', mailRoutes);
