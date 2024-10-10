@@ -1,4 +1,4 @@
-import { config } from '../config/env';
+import { config } from '../../config/env';
 import cors, {CorsOptions} from 'cors';
 import { Request, Response, NextFunction } from 'express';
 

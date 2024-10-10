@@ -6,8 +6,7 @@ import { config } from './config/env';
 
 // Middleware Imports
 import { httpHeaders } from './middlewares/httpSecurity';
-import { apiKeyAuth } from './middlewares/apiKeyAuth';
-import { corsPolicy } from './middlewares/corsConfig';
+import { authHandler } from './middlewares/auth/authHandler';
 import { enforceHttps } from './middlewares/enforceHttps';
 import { logger } from './middlewares/logger';
 
@@ -21,8 +20,7 @@ const PORT: number = config.port;
 // Middleware Setup
 app.use(httpHeaders);
 app.use(express.json());
-app.use(apiKeyAuth);
-app.use(corsPolicy);
+app.use(authHandler);
 app.use(enforceHttps);
 app.use(logger)
 

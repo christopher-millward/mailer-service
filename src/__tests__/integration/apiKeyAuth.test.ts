@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express';
 import request from 'supertest';
-import { apiKeyAuth } from '../../middlewares/apiKeyAuth';
+import { apiKeyAuth } from '../../middlewares/auth/apiKeyAuth';
 
 // Mock the config for API key
 jest.mock('../../config/env', () => ({

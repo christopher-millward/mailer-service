@@ -21,7 +21,12 @@ constructor() {
     auth: {
         user: config.smtpUser,
         pass: config.smtpPass
-    }
+    },
+    // dkim: {          // CONFIGURE DKIM
+    //   domainName: 'yourdomain.com',
+    //   keySelector: 'default',
+    //   privateKey: fs.readFileSync('private.key', 'utf8'),
+    // }
     });
 }
 

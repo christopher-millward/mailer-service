@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { config } from '../config/env';
+import { config } from '../../config/env';
 
 /**
  * @description Middleware to authenticate requests using an API key. This will be used when a

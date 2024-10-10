@@ -1,4 +1,4 @@
-import { corsPolicy } from '../../middlewares/corsConfig';
+import { corsPolicy } from '../../middlewares/auth/corsConfig';
 import express, { Request, Response, Express } from 'express';
 import request from 'supertest';
 
