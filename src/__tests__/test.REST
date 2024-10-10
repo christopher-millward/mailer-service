@@ -14,5 +14,6 @@ Origin: origin1.ca
     "cc": [
         "cc@example.com"
     ],
-    "text": "This is a plain text version of the email."
+    "text": "This is a plain text version of the email.",
+    "attachments":[]
 }

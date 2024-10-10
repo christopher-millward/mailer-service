@@ -1,9 +1,7 @@
 import { Router } from 'express';
 import { sendEmail } from '../controllers/sendMail';
-import { mailOptionsValidationRules } from '../middlewares/validation/mailOptionsValidation';
-import { attachmentValidationRules } from '../middlewares/validation/attachmentValidation';
-import { validateRequest } from '../middlewares/validation/validationRequest';
 import { rateLimiter } from '../middlewares/rateLimiter';
+import { validationHandler } from '../middlewares/validation/validationHandler';
 
 const router: Router = Router();
 
@@ -12,9 +10,7 @@ const router: Router = Router();
  * @description Validates and sends an email with the provided details.
  */
 router.post('/send', 
-    mailOptionsValidationRules,
-    attachmentValidationRules,
-    validateRequest,
+    validationHandler,
     rateLimiter,
     sendEmail
 );

@@ -29,13 +29,9 @@ app.use('/mail', mailRoutes);
 
 //********* JUST FOR QUICK REST TESTING - DELETE PRIOR TO SHIPPING ***********/
 import {Request, Response} from 'express';
-import { mailOptionsValidationRules} from './middlewares/validation/mailOptionsValidation';
-import { attachmentValidationRules } from './middlewares/validation/attachmentValidation';
-import { validateRequest } from './middlewares/validation/validationRequest';
+import { validationHandler } from './middlewares/validation/validationHandler';
 app.post('/test', 
-    mailOptionsValidationRules,
-    // attachmentValidationRules,
-    validateRequest,(req: Request, res: Response) => {
+    validationHandler,(req: Request, res: Response) => {
     res.status(200).json({ message: 'Success' });
 });
 //****************************************************************************/
