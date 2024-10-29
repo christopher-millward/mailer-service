@@ -25,6 +25,7 @@ const emptyField = '';
 const missingField = undefined;
 const sqlInjection = "' OR 1=1 -- ";
 const xssInjection = '<script>alert("XSS")</script>';
+const validHtml = "<p>Valid html!</p>"
 
 // Interface to allow fields to be deleted and improperly formatted. Mimics the MailOptions schema.
 interface MockOptions{
@@ -36,6 +37,7 @@ interface MockOptions{
     text: any;
     html: any;
     attachments: any;
+    [key: string]: any; // add index signature for key-value mods
 }
 
 // Helper function to create new email body. Used to create a new, fully valid object at the beginning of each
@@ -49,28 +51,34 @@ const createMockOptions = () =>  {
         subject: validText,
         text: validText
     } as MockOptions
+};
+
+type ScenarioInput ={
+    // This should only accept an object whose keys are also keys in MockOptions. 
+    // This behaviour is not being enforced tho. Come back and fix later.
+    [K in keyof MockOptions]?: MockOptions[K];
 }
 
-// Interface for test parameters
 interface Scenario {
-    input: any,                 // the value to be assigned during the test
-    expected_status: number,    // espected HTTP status code
-    desc: string                // the description of the test behaviour (to be a parameter in the it() function)
+    input: ScenarioInput;
+    expected_status: number;
+    desc: string;
 }
 
 // Helper function to generate tests
-function createTests(scenario: Scenario, field: keyof MockOptions, app: Express){
+function createTests(scenario: Scenario, app: Express){
     it(scenario.desc, async ()=>{
         const options: MockOptions = createMockOptions();
-        options[field] = scenario.input;
+        for (const key in scenario.input) {
+            options[key] = scenario.input[key];
+        }
 
         const res = await request(app)
             .post('/send')
-            .send(options)
+            .send(options);
 
-        expect(res.status).toBe(scenario.expected_status)
-        // Could come back to add comparisson of response message.
-    })
+        expect(res.status).toBe(scenario.expected_status);
+    });
 }
 
 describe('validate FROM field', () => {
@@ -83,62 +91,62 @@ describe('validate FROM field', () => {
     // Define test cases
     const scenarios: Scenario[] = [
         {
-            input: validEmail,
+            input: {from: validEmail},
             expected_status: 200,
             desc: 'Should validate valid email'
         }, 
         {
-            input: invalidEmail,
+            input: {from: invalidEmail},
             expected_status: 400,
             desc: 'Should invalidate invalid email'
         },{
-            input: validEmailArray,
+            input: {from: validEmailArray},
             expected_status: 400,
             desc: 'Should invalidate valid email in array'
         }, 
         {
-            input: invalidEmailArray,
+            input: {from: invalidEmailArray},
             expected_status: 400,
             desc: 'Should invalidate invalid email in array'
         }, 
         {
-            input: validEmails,
+            input: {from: validEmails},
             expected_status: 400,
             desc: 'Should invalidate valid emails in array'
         }, 
         {
-            input: mixedEmails,
+            input: {from: mixedEmails},
             expected_status: 400,
             desc: 'Should invalidate mixed emails in array'
         }, 
         {
-            input: invalidEmails,
+            input: {from: invalidEmails},
             expected_status: 400,
             desc: 'Should invalidate invalid emails in array'
         },
         {
-            input: emptyField,
+            input: {from: emptyField},
             expected_status: 400,
             desc: 'Should invalidate empty TO field'
         },
         {
-            input: missingField,
+            input: {from: missingField},
             expected_status: 400,
             desc: 'Should invalidate missing TO field'
         },
         {
-            input: sqlInjection,
+            input: {from: sqlInjection},
             expected_status: 400,
             desc: 'Should invalidate SQL injection (invalid email)'
         },
         {
-            input: xssInjection,
+            input: {from: xssInjection},
             expected_status: 400,
             desc: 'Should invalidate XXS injection (invalid email)'
         }
     ]
     // Run tests
-    scenarios.forEach((scenario)=>createTests(scenario, 'from', app))
+    scenarios.forEach((scenario)=>createTests(scenario, app))
 });
 
 describe('validate TO field', () => {
@@ -150,62 +158,62 @@ describe('validate TO field', () => {
     // Define test cases
     const scenarios: Scenario[] = [
         {
-            input: validEmail,
+            input: {to: validEmail},
             expected_status: 400,
             desc: 'Should invalidate valid email not in array'
         }, 
         {
-            input: invalidEmail,
+            input: {to: invalidEmail},
             expected_status: 400,
             desc: 'Should invalidate invalid email not in array'
         },{
-            input: validEmailArray,
+            input: {to: validEmailArray},
             expected_status: 200,
             desc: 'Should validate valid email in array'
         }, 
         {
-            input: invalidEmailArray,
+            input: {to: invalidEmailArray},
             expected_status: 400,
             desc: 'Should invalidate invalid email in array'
         }, 
         {
-            input: validEmails,
+            input: {to: validEmails},
             expected_status: 200,
             desc: 'Should validate valid emails in array'
         }, 
         {
-            input: mixedEmails,
+            input: {to: mixedEmails},
             expected_status: 400,
             desc: 'Should invalidate mixed emails in array'
         }, 
         {
-            input: invalidEmails,
+            input: {to: invalidEmails},
             expected_status: 400,
             desc: 'Should invalidate invalid emails in array'
         },
         {
-            input: emptyField,
+            input: {to: emptyField},
             expected_status: 400,
             desc: 'Should invalidate empty TO field'
         },
         {
-            input: missingField,
+            input: {to: missingField},
             expected_status: 400,
             desc: 'Should invalidate missing TO field'
         },
         {
-            input: sqlInjection,
+            input: {to: sqlInjection},
             expected_status: 400,
             desc: 'Should invalidate SQL injection (invalid email)'
         },
         {
-            input: xssInjection,
+            input: {to: xssInjection},
             expected_status: 400,
             desc: 'Should invalidate XXS injection (invalid email)'
         }
     ]
     // Run tests
-    scenarios.forEach((scenario)=>createTests(scenario, 'to', app))
+    scenarios.forEach((scenario)=>createTests(scenario, app))
 });
 
 describe('validate CC field', () => {
@@ -217,62 +225,62 @@ describe('validate CC field', () => {
     // Define test cases
     const scenarios: Scenario[] = [
         {
-            input: validEmail,
+            input: {cc: validEmail},
             expected_status: 400,
             desc: 'Should invalidate valid email not in array'
         }, 
         {
-            input: invalidEmail,
+            input: {cc: invalidEmail},
             expected_status: 400,
             desc: 'Should invalidate invalid email not in array'
         },{
-            input: validEmailArray,
+            input: {cc: validEmailArray},
             expected_status: 200,
             desc: 'Should validate valid email in array'
         }, 
         {
-            input: invalidEmailArray,
+            input: {cc: invalidEmailArray},
             expected_status: 400,
             desc: 'Should invalidate invalid email in array'
         }, 
         {
-            input: validEmails,
+            input: {cc: validEmails},
             expected_status: 200,
             desc: 'Should validate valid emails in array'
         }, 
         {
-            input: mixedEmails,
+            input: {cc: mixedEmails},
             expected_status: 400,
             desc: 'Should invalidate mixed emails in array'
         }, 
         {
-            input: invalidEmails,
+            input: {cc: invalidEmails},
             expected_status: 400,
             desc: 'Should invalidate invalid emails in array'
         },
         {
-            input: emptyField,
+            input: {cc: emptyField},
             expected_status: 400,
             desc: 'Should invalidate empty CC field'
         },
         {
-            input: missingField,
+            input: {cc: missingField},
             expected_status: 200,
             desc: 'Should validate missing CC field'
         },
         {
-            input: sqlInjection,
+            input: {cc: sqlInjection},
             expected_status: 400,
             desc: 'Should invalidate SQL injection (invalid email)'
         },
         {
-            input: xssInjection,
+            input: {cc: xssInjection},
             expected_status: 400,
             desc: 'Should invalidate XXS injection (invalid email)'
         }
     ]
     // Run tests
-    scenarios.forEach((scenario)=>createTests(scenario, 'cc', app))
+    scenarios.forEach((scenario)=>createTests(scenario, app))
 });
 
 describe('validate BCC field', () => {
@@ -284,62 +292,62 @@ describe('validate BCC field', () => {
     // Define test cases
     const scenarios: Scenario[] = [
         {
-            input: validEmail,
+            input: {bcc: validEmail},
             expected_status: 400,
             desc: 'Should invalidate valid email not in array'
         }, 
         {
-            input: invalidEmail,
+            input: {bcc: invalidEmail},
             expected_status: 400,
             desc: 'Should invalidate invalid email not in array'
         },{
-            input: validEmailArray,
+            input: {bcc: validEmailArray},
             expected_status: 200,
             desc: 'Should validate valid email in array'
         }, 
         {
-            input: invalidEmailArray,
+            input: {bcc: invalidEmailArray},
             expected_status: 400,
             desc: 'Should invalidate invalid email in array'
         }, 
         {
-            input: validEmails,
+            input: {bcc: validEmails},
             expected_status: 200,
             desc: 'Should validate valid emails in array'
         }, 
         {
-            input: mixedEmails,
+            input: {bcc: mixedEmails},
             expected_status: 400,
             desc: 'Should invalidate mixed emails in array'
         }, 
         {
-            input: invalidEmails,
+            input: {bcc: invalidEmails},
             expected_status: 400,
             desc: 'Should invalidate invalid emails in array'
         },
         {
-            input: emptyField,
+            input: {bcc: emptyField},
             expected_status: 400,
             desc: 'Should invalidate empty CC field'
         },
         {
-            input: missingField,
+            input: {bcc: missingField},
             expected_status: 200,
             desc: 'Should validate missing CC field'
         },
         {
-            input: sqlInjection,
+            input: {bcc: sqlInjection},
             expected_status: 400,
             desc: 'Should invalidate SQL injection (invalid email)'
         },
         {
-            input: xssInjection,
+            input: {bcc: xssInjection},
             expected_status: 400,
             desc: 'Should invalidate XXS injection (invalid email)'
         }
     ]
     // Run tests
-    scenarios.forEach((scenario) => createTests(scenario, 'bcc', app))
+    scenarios.forEach((scenario) => createTests(scenario, app))
 });
 
 describe('validate subject field', () => {
@@ -351,33 +359,33 @@ describe('validate subject field', () => {
     // Define test cases
     const scenarios: Scenario[] = [
         {
-            input: validText,
+            input: {subject: validText},
             expected_status: 200,
             desc: 'Should validate valid subject field'
         }, 
         {
-            input: emptyField,
+            input: {subject: emptyField},
             expected_status: 400,
             desc: 'Should invalidate invalid empty subject field'
         },
         {
-            input: missingField,
+            input: {subject: missingField},
             expected_status: 400,
             desc: 'Should invalidate invalid missing subject field'
         },
         {
-            input: sqlInjection,
+            input: {subject: sqlInjection},
             expected_status: 200,
             desc: 'Should validate escaped SQL injection'
         },
         {
-            input: xssInjection,
+            input: {subject: xssInjection},
             expected_status: 200,
             desc: 'Should validate escaped XXS injection'
         }
     ]
     // Run tests
-    scenarios.forEach((scenario)=>createTests(scenario, 'subject', app))
+    scenarios.forEach((scenario)=>createTests(scenario, app))
 });
 
 describe('validate text field', () => {
@@ -389,31 +397,101 @@ describe('validate text field', () => {
     //Define test cases
     const scenarios: Scenario[] = [
         {
-            input: validText,
+            input: {text: validText},
             expected_status: 200,
             desc: 'Should validate valid text field'
         }, 
         {
-            input: emptyField,
+            input: {text: emptyField},
             expected_status: 200,
             desc: 'Should invalidate invalid empty text field'
         },
         {
-            input: missingField,
+            input: {text: missingField},
             expected_status: 400,
             desc: 'Should invalidate invalid missing text field'
         },
         {
-            input: sqlInjection,
+            input: {text: sqlInjection},
             expected_status: 200,
             desc: 'Should validate escaped SQL injection in text field'
         },
         {
-            input: xssInjection,
+            input: {text: xssInjection},
             expected_status: 200,
             desc: 'Should validate escaped XXS injection in text field'
         }
     ]
     // Run tests
-    scenarios.forEach((scenario)=>createTests(scenario, 'text', app))
+    scenarios.forEach((scenario)=>createTests(scenario, app))
+});
+
+describe('validate text and html fields', () => {
+    const app: Express = mockApp();
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
+
+    // Define test cases for text and html fields
+    const scenarios: Scenario[] = [
+        {
+            input: {
+                text: validText,
+                html: validHtml
+            },
+            expected_status: 400,
+            desc: 'Should invalidate presence of both text and html'
+        },
+        {
+            input: {
+                text: validText,
+                html: missingField
+            },
+            expected_status: 200,
+            desc: 'Should validate presence of text only'
+        },
+        {
+            input: {
+                text: missingField,
+                html: validHtml
+            },
+            expected_status: 200,
+            desc: 'Should validate presence of html only'
+        },
+        {
+            input: {
+                text: missingField,
+                html: emptyField
+            },
+            expected_status: 400,
+            desc: 'Should invalidate missing text and empty html'
+        },
+        {
+            input: {
+                text: emptyField,
+                html: missingField
+            },
+            expected_status: 400,
+            desc: 'Should invalidate empty text and missing html'
+        },
+        {
+            input: {
+                text: emptyField,
+                html: emptyField
+            },
+            expected_status: 400,
+            desc: 'Should invalidate empty text and html'
+        },
+        {
+            input: {
+                text: missingField,
+                html: missingField
+            },
+            expected_status: 400,
+            desc: 'Should invalidate absence of both text and html'
+        }
+    ];
+    // Run tests
+    scenarios.forEach((scenario) => createTests(scenario, app));
 });
