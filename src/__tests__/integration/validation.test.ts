@@ -60,7 +60,11 @@ type ScenarioInput ={
 }
 
 interface Scenario {
-    input: ScenarioInput;
+    input: {
+        // This should only accept an object whose keys are also keys in MockOptions. 
+        // This behaviour is not being enforced tho. Come back and fix later.
+        [K in keyof MockOptions]?: MockOptions[K];
+    };
     expected_status: number;
     desc: string;
 }
@@ -99,7 +103,8 @@ describe('validate FROM field', () => {
             input: {from: invalidEmail},
             expected_status: 400,
             desc: 'Should invalidate invalid email'
-        },{
+        },
+        {
             input: {from: validEmailArray},
             expected_status: 400,
             desc: 'Should invalidate valid email in array'
@@ -426,7 +431,42 @@ describe('validate text field', () => {
     scenarios.forEach((scenario)=>createTests(scenario, app))
 });
 
-describe('validate text and html fields', () => {
+describe('validate HTML field', () => {
+    const app: Express = mockApp();
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
+
+    // Define test cases
+    const scenarios: Scenario[] = [
+        {
+            input: {html: validHtml, text: missingField},
+            expected_status: 200,
+            desc: 'Should validate valid HTML'
+        }, 
+        {
+            input: {html: emptyField, text: missingField},
+            expected_status: 400,
+            desc: 'Should invalidate empty HTML'
+        }, 
+        {
+            input: {html: missingField, text: validText},
+            expected_status: 200,
+            desc: 'Should allow missing HTML'
+        }, 
+        {
+            input: {html: validText, text: missingField},
+            expected_status: 200,
+            desc: 'Should allow non-html content to be passed as HTML'
+        }
+    ];
+
+    // Run tests
+    scenarios.forEach((scenario) => createTests(scenario, app));
+});
+
+describe('validate the ensurance of only text or html fields bresent', () => {
     const app: Express = mockApp();
 
     beforeEach(() => {
