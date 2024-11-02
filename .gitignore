@@ -34,3 +34,6 @@ pids/
 
 # Windows-specific files
 Thumbs.db
+
+# Fake Certificates used in testing (generated every time)
+test certs/

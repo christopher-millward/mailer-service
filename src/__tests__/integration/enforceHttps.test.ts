@@ -1,6 +1,9 @@
 import { enforceHttps } from '../../middlewares/enforceHttps';
 import express, { Request, Response, Express } from 'express';
 import request from 'supertest';
+import https from 'https';
+import fs from 'fs';
+import { join } from 'path';
 
 // Mock the config
 jest.mock('../../config/env', () => ({
@@ -9,36 +12,63 @@ jest.mock('../../config/env', () => ({
     },
 }));
 
-describe('enforceHttps Middleware', () => {
+// Create a self-signed SSL certificate for testing
+const createSelfSignedCert = () => {
+    const certsDir = join(__dirname, 'test certs');
+    if (!fs.existsSync(certsDir)) {
+        fs.mkdirSync(certsDir); // Create directory if it does not exist
+    }
+    
+    const { execSync } = require('child_process');
+    execSync(`openssl req -x509 -newkey rsa:2048 -keyout "${join(certsDir, 'key.pem')}" -out "${join(certsDir, 'cert.pem')}" -days 365 -nodes -subj "/CN=localhost"`);
+};
 
+createSelfSignedCert();
+
+const key = fs.readFileSync(join(__dirname, 'test certs', 'key.pem'));
+const cert = fs.readFileSync(join(__dirname, 'test certs', 'cert.pem'));
+
+describe('enforceHttps Middleware', () => {
     let app: Express;
+    let httpsServer: https.Server;
 
     beforeEach(() => {
         app = express();
-        app.use(enforceHttps) // use middleware
-        app.get('/test', (req: Request, res: Response) => {
+        app.use(enforceHttps); // use middleware
+        app.post('/test', (req: Request, res: Response) => {
             res.status(200).json({ message: 'Success' });
         });
+
+        httpsServer = https.createServer({key, cert}, app);
     });
 
     afterEach(() => {
+        httpsServer.close();
         jest.clearAllMocks();
     });
 
     // Use-case 1: HTTPS request in production
-    // don't know how to simulate HTTPS in test environment
-    // it('should response with 200 OK if HTTPS policy used in production', async () => {
-    //     const response = await request(app)
-    //         .get('/test')
-    //         .set('X-Forwarded-Proto', 'https'); // only valid if behind proxy
-    //     expect(response.status).toBe(200);
-    //     expect(response.body.message).toBe('Success');
-    // });
+    it('should response with 200 OK if HTTPS policy used in production', async () => {
+        const httpsAgent = new https.Agent({
+            ca: cert,
+            rejectUnauthorized: false
+        });
+
+        const response = await request(httpsServer)
+            .post('/test')
+            .set('X-Forwarded-Proto', 'https')
+            .agent(httpsAgent);
+
+
+        expect(response.status).toBe(200);
+        expect(response.body.message).toBe('Success');
+    });
 
     // Use-case 2: HTTP request in production
     it('should respond with 302 (redirect) if HTTP policy used in production', async () => {
         const response = await request(app)
-            .get('/test')
+            .post('/test');
+
         expect(response.status).toBe(302);
     });
 
