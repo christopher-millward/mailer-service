@@ -36,5 +36,24 @@ check('attachments').custom((attachments) => {
     });
 
     return true;
+}),
+
+// Enforce allowed fields only (no extra fields)
+check('attachments').custom((attachments) => {
+    const allowedFields = ['filename', 'path', 'content', 'cid']; // keys from SimpleAttachment
+
+    console.log(allowedFields)
+
+    attachments.forEach((attachment: any) => {
+        const keys = Object.keys(attachment);
+
+        keys.forEach((key) => {
+            if (!allowedFields.includes(key)) {
+                throw new Error(`Attachment contains an invalid field: ${key}`);
+            }
+        });
+    });
+
+    return true;
 })
 ];

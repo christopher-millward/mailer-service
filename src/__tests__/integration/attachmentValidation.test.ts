@@ -120,7 +120,6 @@ describe('Attachment Validation Middleware', () => {
 
     it('should pass if `content` is a Buffer', async () => {
         const buffer: Buffer = fs.readFileSync(path.join(testFilesDir, testFiles[0]));
-
         const options: MockMailOptions = createMailOptions();
         const attachment = createAttachmentWithContent();
         attachment.content = buffer
@@ -188,7 +187,7 @@ describe('Attachment Validation Middleware', () => {
             .send(options);
 
         expect(res.status).toBe(400);
-        // expect(res.body.errors[0].msg).toBe('Each attachment must contain either `path` or `content`, but not both or neither.');
+        expect(res.body.errors[0].msg).toBe('Attachment contains an invalid field: unwanted_field');
         
     });
 
