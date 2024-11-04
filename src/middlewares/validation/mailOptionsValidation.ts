@@ -46,7 +46,7 @@ check('text').custom((value, { req }) => {
 
     // Ensure exactly one is provided
     if ((hasText && hasHtml) || (!hasText && !hasHtml)) {
-        throw new Error('Each attachment must contain either `text` or `html`, but not both or neither');
+        throw new Error('Each email must contain either `text` or `html`, but not both or neither');
     }
     return true;
 })
