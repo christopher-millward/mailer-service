@@ -72,6 +72,7 @@ describe('enforceHttps Middleware', () => {
         expect(redirectSpy).toHaveBeenCalledTimes(1);
         expect(response.status).toBe(302);
     });
+
     // Use-case 3: HTTPS from proxy in production
     it('should call next() and return 200 if the request is HTTPS from a proxy in production', async () => {
         const redirectSpy = jest.spyOn(express.response, 'redirect');
@@ -114,7 +115,7 @@ describe('enforceHttps Middleware', () => {
         expect(response.body.message).toBe('Success');
     });
 
-    // Use-case 6: HTTP request in development (non-localhost)
+    // Use-case 6: HTTP request (non-localhost) in development
     it('should call res.redirect() if the request is HTTP in development (non-localhost)', async () => {
         const redirectSpy = jest.spyOn(express.response, 'redirect');
         config.environment = 'development';
