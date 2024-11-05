@@ -1,5 +1,4 @@
 import { check, ValidationChain } from 'express-validator';
-import { SimpleAttachment } from '../../schema/simpleAttachment';
 
 /**
  * @description Validation rules for the email attachments. One of `path` or `content` must be present.
@@ -14,13 +13,7 @@ export const attachmentValidationRules: ValidationChain[] = [
 // Validate each attachment in the array
 check('attachments.*.filename').isString().withMessage('Attachment filename must be a string').escape(),
 check('attachments.*.path').optional().isURL().withMessage('Attachment path must be a URL').escape(),
-check('attachments.*.content').optional().custom((value) => {
-    if (Buffer.isBuffer(value) || typeof value === 'string') {  // can be a Buffer or string (e.g., base64)
-        return true;
-    } else{
-        throw new Error('Attachment content must be a Buffer or string.');
-    }
-}).withMessage('Attachment content must be a Buffer or string.'),
+check('attachments.*.content').optional().isString().withMessage('Attachment content must be a string (or Buffer encoded as string).'),
 check('attachments.*.cid').optional().isString().withMessage('cid must be a string').escape(),
 
 // Ensure only one of `path` or `content` is present, but not both

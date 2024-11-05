@@ -53,9 +53,8 @@ const createAttachmentWithContent = (): MockSimpleAttachment => ({
 });
 
 // Access the test files
-const testFilesDir = path.resolve(__dirname, './test files');
+const testFilesDir = path.resolve(__dirname, 'test files');
 const testFiles = fs.readdirSync(testFilesDir);
-
 
 describe('Attachment Validation Middleware', () => {
     const app: Express = mockApp();
@@ -122,13 +121,13 @@ describe('Attachment Validation Middleware', () => {
         const buffer: Buffer = fs.readFileSync(path.join(testFilesDir, testFiles[0]));
         const options: MockMailOptions = createMailOptions();
         const attachment = createAttachmentWithContent();
-        attachment.content = buffer
+        attachment.content = buffer.toString('base64'); // required transfer format
         options.attachments = [attachment];
         
         const res = await request(app)
             .post('/send')
             .send(options);
-
+            
         expect(res.status).toBe(200);
     });
     
@@ -235,7 +234,8 @@ describe('Attachment Validation Middleware', () => {
     it('should pass if an array of multiple (5) attachments of varying filetype', async () => {
         const attachments: MockSimpleAttachment[] = testFiles.slice(0, 5).map((file) => {
             const attachment = createAttachmentWithContent();
-            attachment.content = fs.readFileSync(path.join(testFilesDir, file));
+            const buffer = fs.readFileSync(path.join(testFilesDir, file));
+            attachment.content = buffer.toString('base64'); // required transport format
             return attachment
         });
 
