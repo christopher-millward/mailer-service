@@ -57,6 +57,9 @@ describe('Attachment Validation Middleware', () => {
         jest.clearAllMocks();
     });
 
+    // Since this suite applies validationHandler instead of attachmentValidation, it
+    // also inherently tests the conditional call to the attachmentValidation middleware.
+    
     it('should pass if attachment is fully valid', async () => {
         const options: MockMailOptions = createMailOptions();
         const attachment = createAttachmentWithPath();
