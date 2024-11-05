@@ -42,8 +42,6 @@ check('attachments').custom((attachments) => {
 check('attachments').custom((attachments) => {
     const allowedFields = ['filename', 'path', 'content', 'cid']; // keys from SimpleAttachment
 
-    console.log(allowedFields)
-
     attachments.forEach((attachment: any) => {
         const keys = Object.keys(attachment);
 
