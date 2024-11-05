@@ -49,5 +49,40 @@ check('text').custom((value, { req }) => {
         throw new Error('Each email must contain either `text` or `html`, but not both or neither');
     }
     return true;
+}),
+
+// Enforce allowed fields only (no extra fields)
+check('attachments').custom((attachments) => {
+    const allowedFields = ['filename', 'path', 'content', 'cid']; // keys from SimpleAttachment
+
+    attachments.forEach((attachment: any) => {
+        const keys = Object.keys(attachment);
+
+        keys.forEach((key) => {
+            if (!allowedFields.includes(key)) {
+                throw new Error(`Attachment contains an invalid field: ${key}`);
+            }
+        });
+    });
+
+    return true;
+}),
+
+// Custom validation to ensure request body conforms to MailOptions schema
+check('*').custom((value, { req }) => {
+    const requestBody = req.body;
+    const mailOptionsKeys = new Set(['from', 'to', 'subject', 'cc', 'bcc', 'text', 'html', 'attachments']); // keys from MailOptions
+    const requestBodyKeys = new Set(Object.keys(requestBody));
+
+    // Check for extra keys not in MailOptions
+    const extraKeys = [...requestBodyKeys].filter(key => !mailOptionsKeys.has(key));
+    if (extraKeys.length > 0) {
+        throw new Error(`Invalid keys found in request body: ${extraKeys.join(', ')}`);
+    }
+
+    return true;
 })
+
+
+
 ];
