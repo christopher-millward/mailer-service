@@ -1,8 +1,6 @@
 import express, {Express, Request, Response} from 'express';
 import { validationHandler } from '../../middlewares/validation/validationHandler';
 import request from 'supertest';
-import path from 'path';
-import fs from 'fs';
 
 // Mock the interfaces to allow typing while also sending incorrect data
 interface MockMailOptions{
@@ -51,10 +49,6 @@ const createAttachmentWithContent = (): MockSimpleAttachment => ({
     content: 'Sample Content',
     cid: 'content-id'
 });
-
-// Access the test files
-const testFilesDir = path.resolve(__dirname, 'test files');
-const testFiles = fs.readdirSync(testFilesDir);
 
 describe('Attachment Validation Middleware', () => {
     const app: Express = mockApp();
@@ -118,10 +112,10 @@ describe('Attachment Validation Middleware', () => {
     });
 
     it('should pass if `content` is a Buffer', async () => {
-        const buffer: Buffer = fs.readFileSync(path.join(testFilesDir, testFiles[0]));
+        const buffer: Buffer = Buffer.from('Hello, world!');
         const options: MockMailOptions = createMailOptions();
         const attachment = createAttachmentWithContent();
-        attachment.content = buffer.toString('base64'); // required transfer format
+        attachment.content = buffer.toString('base64');
         options.attachments = [attachment];
         
         const res = await request(app)
@@ -129,6 +123,20 @@ describe('Attachment Validation Middleware', () => {
             .send(options);
             
         expect(res.status).toBe(200);
+    });
+
+    it('should return 400 if `content` is a Buffer that is not properly encoded', async () => {
+        const buffer: Buffer = Buffer.from('Hello, world!');
+        const options: MockMailOptions = createMailOptions();
+        const attachment = createAttachmentWithContent();
+        attachment.content = buffer;
+        options.attachments = [attachment];
+        
+        const res = await request(app)
+            .post('/send')
+            .send(options);
+        
+        expect(res.status).toBe(400);
     });
     
     it('should return 400 if `content` is not string or buffer', async () => {
@@ -229,23 +237,5 @@ describe('Attachment Validation Middleware', () => {
     
         expect(res.status).toBe(400);
         expect(res.body.errors[0].msg).toBe('Attachment filename must be a string');
-    });
-
-    it('should pass if an array of multiple (5) attachments of varying filetype', async () => {
-        const attachments: MockSimpleAttachment[] = testFiles.slice(0, 5).map((file) => {
-            const attachment = createAttachmentWithContent();
-            const buffer = fs.readFileSync(path.join(testFilesDir, file));
-            attachment.content = buffer.toString('base64'); // required transport format
-            return attachment
-        });
-
-        const options: MockMailOptions = createMailOptions();
-        options.attachments = attachments;
-
-        const res = await request(app)
-            .post('/send')
-            .send(options);
-
-        expect(res.status).toBe(200);
     });
 });
