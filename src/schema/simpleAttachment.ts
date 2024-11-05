@@ -17,3 +17,10 @@ export interface SimpleAttachment {
     content?: Buffer | string;
     cid?: string;
 }
+
+
+/**
+ * List of keys in SimpleAttachment. Since interfaces do not exist at runtime, this list may be used 
+ * to validate/ ensure that all incoming keys are present/valid in the SimpleAttachment schema. 
+ */
+export const SimpleAttachmentKeys = ['filename', 'path', 'content', 'cid']; 

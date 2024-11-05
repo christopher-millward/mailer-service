@@ -24,3 +24,9 @@ export interface MailOptions {
     html?: string;
     attachments?: SimpleAttachment[];
 }
+
+/**
+ * List of keys in MailOptions. Since interfaces do not exist at runtime, this list may be used 
+ * to validate/ ensure that all incoming keys are present/valid in the MailOptions schema. 
+ */
+export const MailOptionsKeys = ['from', 'to', 'subject', 'cc', 'bcc', 'text', 'html', 'attachments'];

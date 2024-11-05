@@ -1,4 +1,5 @@
 import { check, ValidationChain } from 'express-validator';
+import { SimpleAttachmentKeys } from '../../schema/simpleAttachment';
 
 /**
  * @description Validation rules for the email attachments. One of `path` or `content` must be present.
@@ -31,9 +32,9 @@ check('attachments').custom((attachments) => {
     return true;
 }),
 
-// Enforce allowed fields only (no extra fields)
+// Ensure attachment objects conform to SimpleAttachment schema (no unwanted fields)
 check('attachments').custom((attachments) => {
-    const allowedFields = ['filename', 'path', 'content', 'cid']; // keys from SimpleAttachment
+    const allowedFields = SimpleAttachmentKeys;
 
     attachments.forEach((attachment: any) => {
         const keys = Object.keys(attachment);
