@@ -202,6 +202,36 @@ describe('Attachment Validation Middleware', () => {
         expect(res.status).toBe(200);
     });
 
+    it('should pass if sending 2 valid attachments', async () => {
+        const options: MockMailOptions = createMailOptions();
+        const attachment1 = createAttachmentWithPath();
+        const attachment2 = createAttachmentWithContent();
+        options.attachments = [attachment1, attachment2];
+        
+        const res = await request(app)
+            .post('/send')
+            .send(options);
+    
+        expect(res.status).toBe(200);
+    });
+    
+    it('should return 400 if sending 3 attachments: 2 valid and 1 invalid', async () => {
+        const options: MockMailOptions = createMailOptions();
+        const attachment1 = createAttachmentWithPath();
+        const attachment2 = createAttachmentWithContent();
+        const attachment3 = createAttachmentWithPath();
+        delete attachment3.filename; // Making it invalid
+    
+        options.attachments = [attachment1, attachment2, attachment3];
+        
+        const res = await request(app)
+            .post('/send')
+            .send(options);
+    
+        expect(res.status).toBe(400);
+        expect(res.body.errors[0].msg).toBe('Attachment filename must be a string');
+    });
+
     it('should pass if an array of multiple (5) attachments of varying filetype', async () => {
         const attachments: MockSimpleAttachment[] = testFiles.slice(0, 5).map((file) => {
             const attachment = createAttachmentWithContent();
