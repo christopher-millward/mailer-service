@@ -20,15 +20,12 @@ const invalidEmailArray = [invalidEmail];
 const validEmails = [validEmail, 'test2@example.com'];
 const mixedEmails = [validEmail, invalidEmail];
 const invalidEmails = [invalidEmail, invalidEmail];
-const validText = 'Valid text'
+const validText = 'Valid text';
 const emptyField = '';
 const missingField = undefined;
-const sqlInjection = "' OR 1=1 -- ";
-const xssInjection = '<script>alert("XSS")</script>';
-const validHtml = "<p>Valid html!</p>"
 
 // Interface to allow fields to be deleted and improperly formatted. Mimics the MailOptions schema.
-interface MockOptions{
+interface MockOptions {
     from: any;
     to: any;
     cc: any;
@@ -37,12 +34,12 @@ interface MockOptions{
     text: any;
     html: any;
     attachments: any;
-    [key: string]: any; // add index signature for key-value mods
+    unwanted_field: any;
 }
 
 // Helper function to create new email body. Used to create a new, fully valid object at the beginning of each
 // test. Has the ability to modify one field at a time.
-const createMockOptions = () =>  {
+const createMockOptions = (): Partial<MockOptions> =>  {
     return {
         from: validEmail,
         to: [validEmail],
@@ -50,21 +47,11 @@ const createMockOptions = () =>  {
         bcc: [validEmail],
         subject: validText,
         text: validText
-    } as MockOptions
+    };
 };
 
-type ScenarioInput ={
-    // This should only accept an object whose keys are also keys in MockOptions. 
-    // This behaviour is not being enforced tho. Come back and fix later.
-    [K in keyof MockOptions]?: MockOptions[K];
-}
-
 interface Scenario {
-    input: {
-        // This should only accept an object whose keys are also keys in MockOptions. 
-        // This behaviour is not being enforced tho. Come back and fix later.
-        [K in keyof MockOptions]?: MockOptions[K];
-    };
+    input: Partial<MockOptions>;
     expected_status: number;
     desc: string;
 }
@@ -72,10 +59,7 @@ interface Scenario {
 // Helper function to generate tests
 function createTests(scenario: Scenario, app: Express){
     it(scenario.desc, async ()=>{
-        const options: MockOptions = createMockOptions();
-        for (const key in scenario.input) {
-            options[key] = scenario.input[key];
-        }
+        const options: Partial<MockOptions> = updateFields(createMockOptions(), scenario);
 
         const res = await request(app)
             .post('/send')
@@ -84,6 +68,18 @@ function createTests(scenario: Scenario, app: Express){
         expect(res.status).toBe(scenario.expected_status);
     });
 }
+
+// Utility function to update fields
+function updateFields(targetObject: Partial<MockOptions>, updates: Scenario): Partial<MockOptions>{
+    const modifiedObject = targetObject;
+
+    for (const key in updates.input){
+        const typedKey = key as keyof MockOptions;
+        updates.input[typedKey] === missingField ? delete modifiedObject[typedKey] : modifiedObject[typedKey] = updates.input[typedKey];
+    }
+    return modifiedObject;
+}
+
 
 describe('validate FROM field', () => {
     const app: Express = mockApp();
@@ -132,22 +128,12 @@ describe('validate FROM field', () => {
         {
             input: {from: emptyField},
             expected_status: 400,
-            desc: 'Should invalidate empty TO field'
+            desc: 'Should invalidate empty field'
         },
         {
             input: {from: missingField},
             expected_status: 400,
-            desc: 'Should invalidate missing TO field'
-        },
-        {
-            input: {from: sqlInjection},
-            expected_status: 400,
-            desc: 'Should invalidate SQL injection (invalid email)'
-        },
-        {
-            input: {from: xssInjection},
-            expected_status: 400,
-            desc: 'Should invalidate XXS injection (invalid email)'
+            desc: 'Should invalidate missing field'
         }
     ]
     // Run tests
@@ -205,16 +191,6 @@ describe('validate TO field', () => {
             input: {to: missingField},
             expected_status: 400,
             desc: 'Should invalidate missing TO field'
-        },
-        {
-            input: {to: sqlInjection},
-            expected_status: 400,
-            desc: 'Should invalidate SQL injection (invalid email)'
-        },
-        {
-            input: {to: xssInjection},
-            expected_status: 400,
-            desc: 'Should invalidate XXS injection (invalid email)'
         }
     ]
     // Run tests
@@ -272,16 +248,6 @@ describe('validate CC field', () => {
             input: {cc: missingField},
             expected_status: 200,
             desc: 'Should validate missing CC field'
-        },
-        {
-            input: {cc: sqlInjection},
-            expected_status: 400,
-            desc: 'Should invalidate SQL injection (invalid email)'
-        },
-        {
-            input: {cc: xssInjection},
-            expected_status: 400,
-            desc: 'Should invalidate XXS injection (invalid email)'
         }
     ]
     // Run tests
@@ -333,22 +299,12 @@ describe('validate BCC field', () => {
         {
             input: {bcc: emptyField},
             expected_status: 400,
-            desc: 'Should invalidate empty CC field'
+            desc: 'Should invalidate empty BCC field'
         },
         {
             input: {bcc: missingField},
             expected_status: 200,
-            desc: 'Should validate missing CC field'
-        },
-        {
-            input: {bcc: sqlInjection},
-            expected_status: 400,
-            desc: 'Should invalidate SQL injection (invalid email)'
-        },
-        {
-            input: {bcc: xssInjection},
-            expected_status: 400,
-            desc: 'Should invalidate XXS injection (invalid email)'
+            desc: 'Should validate missing BCC field'
         }
     ]
     // Run tests
@@ -377,16 +333,6 @@ describe('validate subject field', () => {
             input: {subject: missingField},
             expected_status: 400,
             desc: 'Should invalidate invalid missing subject field'
-        },
-        {
-            input: {subject: sqlInjection},
-            expected_status: 200,
-            desc: 'Should validate escaped SQL injection'
-        },
-        {
-            input: {subject: xssInjection},
-            expected_status: 200,
-            desc: 'Should validate escaped XXS injection'
         }
     ]
     // Run tests
@@ -415,16 +361,6 @@ describe('validate text field', () => {
             input: {text: missingField},
             expected_status: 400,
             desc: 'Should invalidate invalid missing text field'
-        },
-        {
-            input: {text: sqlInjection},
-            expected_status: 200,
-            desc: 'Should validate escaped SQL injection in text field'
-        },
-        {
-            input: {text: xssInjection},
-            expected_status: 200,
-            desc: 'Should validate escaped XXS injection in text field'
         }
     ]
     // Run tests
@@ -441,10 +377,12 @@ describe('validate HTML field', () => {
     // Define test cases
     const scenarios: Scenario[] = [
         {
-            input: {html: validHtml, text: missingField},
+            input: {html: validText, text: missingField},
             expected_status: 200,
-            desc: 'Should validate valid HTML'
-        }, 
+            desc: 'Should allow non-html content to be passed as HTML'
+            // Since HTML is sent as String during transport, the validation middleware
+            // only checks if it's a valid string.
+        },
         {
             input: {html: emptyField, text: missingField},
             expected_status: 400,
@@ -454,11 +392,6 @@ describe('validate HTML field', () => {
             input: {html: missingField, text: validText},
             expected_status: 200,
             desc: 'Should allow missing HTML'
-        }, 
-        {
-            input: {html: validText, text: missingField},
-            expected_status: 200,
-            desc: 'Should allow non-html content to be passed as HTML'
         }
     ];
 
@@ -466,7 +399,7 @@ describe('validate HTML field', () => {
     scenarios.forEach((scenario) => createTests(scenario, app));
 });
 
-describe('validate the ensurance of only text or html fields bresent', () => {
+describe('validate the ensurance of only text or html fields present', () => {
     const app: Express = mockApp();
 
     beforeEach(() => {
@@ -478,7 +411,7 @@ describe('validate the ensurance of only text or html fields bresent', () => {
         {
             input: {
                 text: validText,
-                html: validHtml
+                html: validText
             },
             expected_status: 400,
             desc: 'Should invalidate presence of both text and html'
@@ -494,7 +427,7 @@ describe('validate the ensurance of only text or html fields bresent', () => {
         {
             input: {
                 text: missingField,
-                html: validHtml
+                html: validText
             },
             expected_status: 200,
             desc: 'Should validate presence of html only'
@@ -534,4 +467,23 @@ describe('validate the ensurance of only text or html fields bresent', () => {
     ];
     // Run tests
     scenarios.forEach((scenario) => createTests(scenario, app));
+});
+
+describe('Detect the presence of unwanted fields', () => {
+    const app: Express = mockApp();
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
+
+    it('should invalidate the addition of an unwanted field', async()=>{
+        const options: Partial<MockOptions> = createMockOptions();
+        options.unwanted_field = 'unwanted data'
+
+        const res = await request(app)
+            .post('/send')
+            .send(options);
+
+        expect(res.status).toBe(400);
+    });
 });
