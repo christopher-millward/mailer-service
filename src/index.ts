@@ -27,15 +27,6 @@ app.use(enforceHttps);
 // Route Setup
 app.use('/mail', mailRoutes);
 
-//********* JUST FOR QUICK REST TESTING - DELETE PRIOR TO SHIPPING ***********/
-import {Request, Response} from 'express';
-import { validationHandler } from './middlewares/validation/validationHandler';
-app.post('/test', 
-    validationHandler,(req: Request, res: Response) => {
-    res.status(200).json({ message: 'Success' });
-});
-//****************************************************************************/
-
 // Start Server
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
