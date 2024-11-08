@@ -12,7 +12,7 @@ interface MockMailOptions{
 }
 interface MockSimpleAttachment {
     filename?: any,
-    path?: any,
+    href?: any,
     cid?: any, 
     content?: any,
     unwanted_field?: any
@@ -41,7 +41,7 @@ const createMailOptions = (): MockMailOptions=> {
 // Helper functions to create valid attachments
 const createAttachmentWithPath = (): MockSimpleAttachment => ({
     filename: 'test.txt',
-    path:'http://example.com/file.txt',
+    href:'http://example.com/file.txt',
     cid: 'content-id'
 });
 const createAttachmentWithContent = (): MockSimpleAttachment => ({
@@ -156,10 +156,10 @@ describe('Attachment Validation Middleware', () => {
         expect(res.status).toBe(400);
     });
 
-    it('should return 400 if attachment is both `path` and `content`', async () => {
+    it('should return 400 if attachment is both `href` and `content`', async () => {
         const options: MockMailOptions = createMailOptions();
         const attachment = createAttachmentWithContent();
-        attachment.path = 'http://example.com/file.txt'
+        attachment.href = 'http://example.com/file.txt'
         options.attachments = [attachment];
         
         const res = await request(app)
@@ -167,14 +167,14 @@ describe('Attachment Validation Middleware', () => {
             .send(options);
 
         expect(res.status).toBe(400);
-        expect(res.body.errors[0].msg).toBe('Each attachment must contain either `path` or `content`, but not both or neither.');
+        expect(res.body.errors[0].msg).toBe('Each attachment must contain either `href` or `content`, but not both or neither.');
         
     });
 
-    it('should return 400 if both `path` and `content` are missing', async () => {
+    it('should return 400 if both `href` and `content` are missing', async () => {
         const options: MockMailOptions = createMailOptions();
         const attachment = createAttachmentWithPath();
-        delete attachment.path 
+        delete attachment.href 
         options.attachments = [attachment];
         
         const res = await request(app)
@@ -182,7 +182,7 @@ describe('Attachment Validation Middleware', () => {
             .send(options);
 
         expect(res.status).toBe(400);
-        expect(res.body.errors[0].msg).toBe('Each attachment must contain either `path` or `content`, but not both or neither.');
+        expect(res.body.errors[0].msg).toBe('Each attachment must contain either `href` or `content`, but not both or neither.');
         
     });
 
