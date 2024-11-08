@@ -10,15 +10,15 @@ const logStream = fs.createWriteStream(path.join(__dirname, relPath), { flags: '
 // Configure morgan
 const morganConfig = morgan((tokens, req: Request, res: Response) => {
     return [
-        tokens.method(req, res),                // method
-        tokens.url(req, res),                   // request url
-        tokens.status(req, res),                // status code
-        tokens.referrer(req, res),              // referrer 
-        tokens['remote-addr'](req, res),        // IP address
-        tokens.req(req, res, 'header-name'),    // request header
-        tokens['http-version'](req, res),       // http version
-        tokens.date(req, res, 'web'),           // Date and time
-        tokens['response-time'](req, res), '(ms)'
+        tokens.method(req, res),                    // method
+        tokens.url(req, res),                       // request url
+        tokens.status(req, res),                    // status code
+        tokens.referrer(req, res),                  // referrer 
+        tokens['remote-addr'](req, res),            // IP address
+        tokens.req(req, res, 'header-name'),        // request header
+        tokens['http-version'](req, res),           // http version
+        tokens.date(req, res, 'web'),               // Date and time
+        tokens['response-time'](req, res), '(ms)'   //Response time
     ].join(' '); // Join the logged items with spaces
 }, { stream: logStream }); // Log to the specified stream
 
