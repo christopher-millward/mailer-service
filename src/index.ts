@@ -5,6 +5,7 @@ import express, { Express } from 'express';
 import { config } from './config/env';
 
 // Middleware Imports
+import { uniqueID } from './middlewares/uniqueID';
 import { logger } from './middlewares/logger';
 import { httpHeaders } from './middlewares/httpSecurity';
 import { authHandler } from './middlewares/auth/authHandler';
@@ -18,7 +19,8 @@ const app: Express = express();
 const PORT: number = config.port;
 
 // Middleware Setup
-app.use(logger)
+app.use(uniqueID);
+app.use(logger);
 app.use(httpHeaders);
 app.use(express.json());
 app.use(authHandler);
