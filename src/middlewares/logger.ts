@@ -1,30 +1,33 @@
-import morgan from 'morgan';
+import winston from 'winston';
 import { Request, Response, NextFunction } from 'express';
-import fs from 'fs';
 import path from 'path';
 
-// Create a write stream (in append mode) for logging to a file
-const relPath: string = '../../logs/access.log' // relative path to where the log is stored
-const logStream = fs.createWriteStream(path.join(__dirname, relPath), { flags: 'a' });
 
-// Configure morgan
-const morganConfig = morgan((tokens, req: Request, res: Response) => {
-    return [
-        tokens.method(req, res),                    // method
-        tokens.url(req, res),                       // request url
-        tokens.status(req, res),                    // status code
-        tokens.referrer(req, res),                  // referrer 
-        tokens['remote-addr'](req, res),            // IP address
-        tokens.req(req, res, 'header-name'),        // request header
-        tokens['http-version'](req, res),           // http version
-        tokens.date(req, res, 'web'),               // Date and time
-        tokens['response-time'](req, res), '(ms)'   //Response time
-    ].join(' '); // Join the logged items with spaces
-}, { stream: logStream }); // Log to the specified stream
+// Destructure the winston formatting functions for easier readability
+const { combine, timestamp, printf, colorize } = winston.format;
+
+const relPath: string = '../../logs/access.log'; // relative path to where the log is stored
+const absPath: string = path.join(__dirname, relPath);
+
+// Create a logger instance
+const loggerInstance = winston.createLogger({
+    level: 'info',
+    format: combine(
+        timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+        printf(({ timestamp, level, message }) => {
+            return `${timestamp} ${level}: ${message}`;
+        }),
+        // colorize({all: true})   // Can uncomment during development
+    ),
+    transports: [
+        new winston.transports.File({ filename: absPath}),
+        // new winston.transports.Console()     // Can uncomment during development
+    ]
+});
 
 /**
- * @description Middleware for logging HTTP requests using Morgan. Logs the request method, status code, IP address, url, date and time, 
- *              and response time into a local file.
+ * @description Middleware for logging HTTP requests and API activity. Logs the request ID, method, url, status code, 
+ *              referrer, IP address, HTTP version, date and response time.
  * 
  * @param {Request} req - Express request object.
  * @param {Response} res - Express response object.
@@ -32,5 +35,24 @@ const morganConfig = morgan((tokens, req: Request, res: Response) => {
  * @returns {void} Calls the next middleware function.
  */
 export const logger = (req: Request, res: Response, next: NextFunction) => {
-    morganConfig(req, res, next);
+    const startTime = Date.now();
+    
+    res.on('finish', () => {
+        const duration = Date.now() - startTime;
+        const logMessage = [
+            `[Request ID: ${req.id}]`,                  // unique ID
+            `Method: ${req.method}`,                    // method
+            `URL: ${req.url}`,                          // request url
+            `Status: ${res.statusCode}`,                // status code
+            `Referrer: ${req.get('referrer') || '-'}`,  // referrer
+            `Remote Addr: ${req.ip}`,                   // IP address
+            `HTTP Version: ${req.httpVersion}`,         // HTTP version
+            `Date: ${new Date().toISOString()}`,        // date
+            `Response Time: ${duration} ms`             // response time
+        ].join(' | ');
+
+        loggerInstance.info(logMessage);
+    });
+
+    next();
 };
