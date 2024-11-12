@@ -1,6 +1,7 @@
 import winston from 'winston';
 import { Request, Response, NextFunction } from 'express';
 import path from 'path';
+import { MailOptions } from '../schema/mailOptions';
 
 
 // Destructure the winston formatting functions for easier readability
@@ -36,6 +37,7 @@ const loggerInstance = winston.createLogger({
  */
 export const logger = (req: Request, res: Response, next: NextFunction) => {
     const startTime = Date.now();
+    const emailDetials: MailOptions = req.body;
     
     res.on('finish', () => {
         const duration = Date.now() - startTime;
@@ -48,7 +50,10 @@ export const logger = (req: Request, res: Response, next: NextFunction) => {
             `Remote Addr: ${req.ip}`,                   // IP address
             `HTTP Version: ${req.httpVersion}`,         // HTTP version
             `Date: ${new Date().toISOString()}`,        // date
-            `Response Time: ${duration} ms`             // response time
+            `Response Time: ${duration} ms`,            // response time
+            `Sender Email: ${emailDetials.from}`,        // sender email
+            `Recipient emails: ${emailDetials.to}`,      // recipient email
+            `Email subject line: ${emailDetials.subject}`// subject line
         ].join(' | ');
 
         loggerInstance.info(logMessage);
