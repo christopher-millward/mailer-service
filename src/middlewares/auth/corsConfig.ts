@@ -25,7 +25,9 @@ export const corsPolicy = (req: Request, res: Response, next: NextFunction): voi
                 callback(null, origin);
             } else {
                 // Otherwise, block the request with an error
-                callback(new Error('Untrusted Origin'));
+                const error: Error = new Error("Unauthorized Access: untrusted origin");
+                error.name = "Auth Error";
+                callback(error, false);
             }
         },
         methods: ['POST', 'OPTIONS'],

@@ -18,8 +18,10 @@ export const apiKeyAuth = (req: Request, res: Response, next: NextFunction): voi
         // Call the next middleware if authentication succeeds
         next();
     }else{
-        // Return a response if authentication fails
-        res.status(401).json({ message: 'Unauthorized access.' });
-        return; 
+        // Send error to error handler
+        const error: Error = new Error("Unauthorized Access: invalid API key.");
+        error.name = "Auth Error";
+
+        next(error);
     }  
 };
