@@ -1,6 +1,5 @@
 import { check, ValidationChain } from 'express-validator';
 import { MailOptionsKeys } from '../../schema/mailOptions';
-import { SimpleAttachmentKeys } from '../../schema/simpleAttachment';
 
 /**
  * @description Validation rules for the email data.
