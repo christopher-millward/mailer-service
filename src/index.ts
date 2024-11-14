@@ -7,6 +7,7 @@ import { config } from './config/env';
 // Middleware Imports
 import { uniqueID } from './middlewares/uniqueID';
 import { logger } from './middlewares/logger';
+import { corsPolicy } from './middlewares/auth/corsPolicy';
 import { httpHeaders } from './middlewares/httpSecurity';
 import { authHandler } from './middlewares/auth/authHandler';
 import { enforceHttps } from './middlewares/enforceHttps';
@@ -21,6 +22,7 @@ const PORT: number = config.port;
 // Middleware Setup
 app.use(uniqueID);
 app.use(logger);
+app.use(corsPolicy);
 app.use(httpHeaders);
 app.use(express.json());
 app.use(authHandler);
