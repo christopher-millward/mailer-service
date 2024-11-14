@@ -1,7 +1,7 @@
 import express, { Express, Request, Response } from 'express';
 import { authHandler } from '../../middlewares/auth/authHandler';
 import { apiKeyAuth } from '../../middlewares/auth/apiKeyAuth';
-import { corsPolicy } from '../../middlewares/auth/corsConfig';
+import { corsPolicy } from '../../middlewares/auth/corsPolicy';
 import request from 'supertest';
 
 

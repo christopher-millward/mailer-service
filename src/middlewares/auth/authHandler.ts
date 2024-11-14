@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { apiKeyAuth } from './apiKeyAuth';
-import { corsPolicy } from './corsConfig';
+import { corsPolicy } from './corsPolicy';
 
 /**
  * @description Middleware to conditionally apply the API key authentication middleware.
