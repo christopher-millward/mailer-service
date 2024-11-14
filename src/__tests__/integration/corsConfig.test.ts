@@ -1,6 +1,7 @@
 import { corsPolicy } from '../../middlewares/auth/corsPolicy';
 import express, { Request, Response, Express } from 'express';
 import request from 'supertest';
+import { errorHandler } from '../../middlewares/errorHandler';
 
 // Mock config for CORS allowed origins
 jest.mock('../../config/env', () => ({
@@ -14,9 +15,11 @@ describe('CORS Middleware', () => {
 
     beforeEach(() => {
         app = express();
+        app.use(corsPolicy);
+        app.use(errorHandler);
         // Route that uses the corsPolicy middleware
-        app.options('/test', corsPolicy); // Handle OPTIONS requests for preflight
-        app.post('/test', corsPolicy, (req: Request, res: Response) => {
+        app.options('/test'); // Handle OPTIONS requests for preflight
+        app.post('/test', (req: Request, res: Response) => {
             res.status(200).json({ message: 'Access granted' });
         });
     });

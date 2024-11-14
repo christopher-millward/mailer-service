@@ -20,13 +20,8 @@ export const validationHandler = [
     async (req: Request, res: Response, next: NextFunction) => {
         try {
             if (hasAttachments(req)) {
-                const attachmentErrors: ValidationError[]|null = await validateAttachments(req);
-                if (attachmentErrors) {
-                    return res.status(400).json({ errors: attachmentErrors });
-                }
+                await validateAttachments(req);
             }
-
-            // Proceed to the next middleware if validations pass
             next();
         } catch (error) {
             next(error);

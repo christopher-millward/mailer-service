@@ -14,6 +14,7 @@ import { enforceHttps } from './middlewares/enforceHttps';
 
 // Route Imports
 import mailRoutes from './routes/mailRoutes';
+import { errorHandler } from './middlewares/errorHandler';
 
 // Create an Express app instance
 const app: Express = express();
@@ -27,6 +28,7 @@ app.use(httpHeaders);
 app.use(express.json());
 app.use(authHandler);
 app.use(enforceHttps);
+app.use(errorHandler);  // Must be last!
 
 // Route Setup
 app.use('/mail', mailRoutes);

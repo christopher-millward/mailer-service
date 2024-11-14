@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { config } from '../../config/env';
+import { ResponseError } from '../../types/responseError';
 
 /**
  * @description Middleware to authenticate requests using an API key. This will be used when a
@@ -19,8 +20,9 @@ export const apiKeyAuth = (req: Request, res: Response, next: NextFunction): voi
         next();
     }else{
         // Send error to error handler
-        const error: Error = new Error("Unauthorized Access: invalid API key.");
+        const error: ResponseError = new Error("Unauthorized Access: invalid API key.");
         error.name = "Auth Error";
+        error.status = 401;
 
         next(error);
     }  

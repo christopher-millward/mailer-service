@@ -5,6 +5,7 @@ import https from 'https';
 import fs from 'fs';
 import { join } from 'path';
 import { config } from '../../config/env';
+import { errorHandler } from '../../middlewares/errorHandler';
 
 // Mock the config
 jest.mock('../../config/env', () => ({
@@ -37,6 +38,7 @@ describe('enforceHttps Middleware', () => {
     beforeEach(() => {
         app = express();
         app.use(enforceHttps); // use middleware
+        app.use(errorHandler);
         app.post('/test', (req: Request, res: Response) => {
             res.status(200).json({ message: 'Success' });
         });

@@ -1,5 +1,6 @@
 import { check, ValidationChain } from 'express-validator';
 import { SimpleAttachmentKeys } from '../../schema/simpleAttachment';
+import { ResponseError } from '../../types/responseError';
 
 /**
  * @description Validation rules for the email attachments. One of `href` or `content` must be present.
@@ -25,7 +26,9 @@ check('attachments').custom((attachments) => {
 
         // Ensure exactly one is provided
         if ((hasPath && hasContent) || (!hasPath && !hasContent)) {
-            throw new Error('Each attachment must contain either `href` or `content`, but not both or neither.');
+            const error: ResponseError = new Error('Each attachment must contain either `href` or `content`, but not both or neither.');
+            error.status = 400;
+            throw error;
         }
     });
 
@@ -41,7 +44,9 @@ check('attachments').custom((attachments) => {
 
         keys.forEach((key) => {
             if (!allowedFields.includes(key)) {
-                throw new Error(`Attachment contains an invalid field: ${key}`);
+                const error: ResponseError = new Error(`Attachment contains an invalid field: ${key}`);
+                error.status = 400;
+                throw error;
             }
         });
     });

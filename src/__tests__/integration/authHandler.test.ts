@@ -3,6 +3,7 @@ import { authHandler } from '../../middlewares/auth/authHandler';
 import { apiKeyAuth } from '../../middlewares/auth/apiKeyAuth';
 import { corsPolicy } from '../../middlewares/auth/corsPolicy';
 import request from 'supertest';
+import { errorHandler } from '../../middlewares/errorHandler';
 
 
 jest.mock('../../middlewares/auth/apiKeyAuth');
@@ -12,7 +13,9 @@ jest.mock('../../middlewares/auth/corsConfig');
 const mockApp = () => {
     const app: Express = express();
     app.use(express.json());
-    app.post('/test', authHandler, (req: Request, res: Response) => {
+    app.use(authHandler);
+    app.use(errorHandler);
+    app.post('/test', (req: Request, res: Response) => {
         res.status(200).json({ message: 'Success' });
     });
     return app;

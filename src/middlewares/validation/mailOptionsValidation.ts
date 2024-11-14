@@ -1,5 +1,6 @@
 import { check, ValidationChain } from 'express-validator';
 import { MailOptionsKeys } from '../../schema/mailOptions';
+import { ResponseError } from '../../types/responseError';
 
 /**
  * @description Validation rules for the email data.
@@ -46,7 +47,9 @@ check('text').custom((value, { req }) => {
 
     // Ensure exactly one is provided
     if ((hasText && hasHtml) || (!hasText && !hasHtml)) {
-        throw new Error('Each email must contain either `text` or `html`, but not both or neither');
+        const error: ResponseError = new Error('Each email must contain either `text` or `html`, but not both or neither');
+        error.status = 400;
+        throw error;
     }
     return true;
 }),
@@ -59,7 +62,9 @@ check('*').custom((value, { req }) => {
 
     requestBodyKeys.forEach((key)=>{
         if(!allowedFields.includes(key)){
-            throw new Error(`Attachment contains an invalid field: ${key}`);
+            const error: ResponseError = new Error(`Attachment contains an invalid field: ${key}`);
+            error.status = 400;
+            throw error;
         }
     })
 

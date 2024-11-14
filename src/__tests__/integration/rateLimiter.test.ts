@@ -2,13 +2,16 @@ import express, { Request, Response, Express } from 'express';
 import request from 'supertest';
 import { rateLimiter } from '../../middlewares/rateLimiter';
 import { config } from '../../config/env';
+import { errorHandler } from '../../middlewares/errorHandler';
 
 // Helper function to create the test app
 const mockApp = () => {
     const app: Express = express();
     app.use(express.json());
+    app.use(rateLimiter);
+    app.use(errorHandler);
     config.environment === 'test' ? app.set('trust proxy', true): null; // allow for detection of XFF header in testing
-    app.post('/send', rateLimiter, (req: Request, res: Response) => {
+    app.post('/send', (req: Request, res: Response) => {
         res.status(200).json({ message: 'Email sent' });
     });
     return app;

@@ -1,6 +1,7 @@
 import express, {Express, Request, Response} from 'express';
 import { validationHandler } from '../../middlewares/validation/validationHandler';
 import request from 'supertest';
+import { errorHandler } from '../../middlewares/errorHandler';
 
 // Mock the interfaces to allow typing while also sending incorrect data
 interface MockMailOptions{
@@ -22,7 +23,9 @@ interface MockSimpleAttachment {
 const mockApp = () => {
     const app: Express = express();
     app.use(express.json());
-    app.post('/send', validationHandler, (req: Request, res: Response) => {
+    app.use(validationHandler);
+    app.use(errorHandler);
+    app.post('/send', (req: Request, res: Response) => {
         res.status(200).json({ message: 'Validation passed' });
     });
     return app;

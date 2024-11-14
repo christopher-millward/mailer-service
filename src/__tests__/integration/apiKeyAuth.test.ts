@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express';
 import request from 'supertest';
 import { apiKeyAuth } from '../../middlewares/auth/apiKeyAuth';
+import { errorHandler } from '../../middlewares/errorHandler';
 
 // Mock the config for API key
 jest.mock('../../config/env', () => ({
@@ -16,8 +17,10 @@ describe('API Key Authentication Middleware Integration Tests', () => {
     // Setup a simple Express app with the apiKeyAuth middleware
     beforeAll(() => {
         app = express();
+        app.use(apiKeyAuth);
+        app.use(errorHandler);
         // Route that uses the apiKeyAuth middleware
-        app.get('/test', apiKeyAuth, (req: Request, res: Response) => {
+        app.get('/test', (req: Request, res: Response) => {
             res.status(200).json({ message: 'Access granted' });
         });
     });

@@ -1,3 +1,4 @@
+import { ResponseError } from "../types/responseError";
 import { config } from "./env";
 import { CorsOptions } from "cors";
 
@@ -23,8 +24,8 @@ export const corsOptions: CorsOptions = {
             callback(null, origin);
         } else {
             // Block requests from untrusted origins.
-            const error: Error = new Error("Unauthorized Access: untrusted origin");
-            error.name = "Auth Error";
+            const error: ResponseError = new Error("Unauthorized Access: untrusted origin");
+            error.status = 502;
             callback(error, false);
         }
     },
