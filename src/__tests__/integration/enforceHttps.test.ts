@@ -14,19 +14,6 @@ jest.mock('../../config/env', () => ({
     },
 }));
 
-// Create a self-signed SSL certificate for testing
-const createSelfSignedCert = () => {
-    const certsDir = join(__dirname, 'test certs');
-    if (!fs.existsSync(certsDir)) {
-        fs.mkdirSync(certsDir); // Create directory if it does not exist
-    }
-    
-    const { execSync } = require('child_process');
-    execSync(`openssl req -x509 -newkey rsa:2048 -keyout "${join(certsDir, 'key.pem')}" -out "${join(certsDir, 'cert.pem')}" -days 365 -nodes -subj "/CN=localhost"`);
-};
-
-createSelfSignedCert();
-
 const key = fs.readFileSync(join(__dirname, 'test certs', 'key.pem'));
 const cert = fs.readFileSync(join(__dirname, 'test certs', 'cert.pem'));
 const httpsAgent = new https.Agent({ca: cert, rejectUnauthorized: false});
@@ -34,7 +21,7 @@ const httpsAgent = new https.Agent({ca: cert, rejectUnauthorized: false});
 describe('enforceHttps Middleware', () => {
     
     const app = express();
-    app.use(enforceHttps); // use middleware
+    app.use(enforceHttps);
     app.use(mockErrorHandler);
     app.post('/test', (req: Request, res: Response) => {
         res.status(200).json({ message: 'Success' });
