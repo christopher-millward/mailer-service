@@ -5,7 +5,7 @@ import https from 'https';
 import fs from 'fs';
 import { join } from 'path';
 import { config } from '../../config/env';
-import { errorHandler } from '../../middlewares/errorHandler';
+import { mockErrorHandler } from '../testUtilities/mockErrorHandler';
 
 // Mock the config
 jest.mock('../../config/env', () => ({
@@ -32,27 +32,24 @@ const cert = fs.readFileSync(join(__dirname, 'test certs', 'cert.pem'));
 const httpsAgent = new https.Agent({ca: cert, rejectUnauthorized: false});
 
 describe('enforceHttps Middleware', () => {
-    let app: Express;
-    let httpsServer: https.Server;
-
-    beforeEach(() => {
-        app = express();
-        app.use(enforceHttps); // use middleware
-        app.use(errorHandler);
-        app.post('/test', (req: Request, res: Response) => {
-            res.status(200).json({ message: 'Success' });
-        });
-
-        httpsServer = https.createServer({key, cert}, app);
+    
+    const app = express();
+    app.use(enforceHttps); // use middleware
+    app.use(mockErrorHandler);
+    app.post('/test', (req: Request, res: Response) => {
+        res.status(200).json({ message: 'Success' });
     });
 
+    const httpsServer = https.createServer({key, cert}, app);
+
+    
     afterEach(() => {
         httpsServer.close();
         jest.clearAllMocks();
     });
 
     // Use-case 1: HTTPS in production
-    it('should call next() and return 200 if the request is HTTPS in production', async () => {
+    it('should return 200 if the request is HTTPS in production', async () => {
         const redirectSpy = jest.spyOn(express.response, 'redirect');
 
         const response = await request(httpsServer)
@@ -76,7 +73,7 @@ describe('enforceHttps Middleware', () => {
     });
 
     // Use-case 3: HTTPS from proxy in production
-    it('should call next() and return 200 if the request is HTTPS from a proxy in production', async () => {
+    it('should return 200 if the request is HTTPS from a proxy in production', async () => {
         const redirectSpy = jest.spyOn(express.response, 'redirect');
 
         const response = await request(httpsServer)
@@ -90,7 +87,7 @@ describe('enforceHttps Middleware', () => {
     });
 
     // Use-case 4: HTTPS request in development
-    it('should call next() and return 200 if the request is HTTPS in development', async () => {
+    it('should return 200 if the request is HTTPS in development', async () => {
         const redirectSpy = jest.spyOn(express.response, 'redirect');
         config.environment = 'development'
 
@@ -104,7 +101,7 @@ describe('enforceHttps Middleware', () => {
     });
 
     // Use-case 5: HTTP request from localhost in development
-    it('should call next() and return 200 if the request is HTTP from localhost in development', async () => {
+    it('should return 200 if the request is HTTP from localhost in development', async () => {
         const redirectSpy = jest.spyOn(express.response, 'redirect');
         config.environment = 'development';
 
@@ -131,7 +128,7 @@ describe('enforceHttps Middleware', () => {
     });
 
     // Use-case 7: HTTPS request from proxy in development
-    it('should call next() and return 200 if the request is HTTPS from a proxy in development', async () => {
+    it('should return 200 if the request is HTTPS from a proxy in development', async () => {
         const redirectSpy = jest.spyOn(express.response, 'redirect');
         config.environment = 'development';
 

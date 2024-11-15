@@ -1,14 +1,14 @@
 import express, { Request, Response, Express } from 'express';
 import request from 'supertest';
 import { validationHandler } from '../../middlewares/validation/validationHandler';
-import { errorHandler } from '../../middlewares/errorHandler';
+import { mockErrorHandler } from '../testUtilities/mockErrorHandler';
 
 // Helper function to create the test app
 const mockApp = () => {
     const app: Express = express();
     app.use(express.json());
     app.use(validationHandler);
-    app.use(errorHandler);
+    app.use(mockErrorHandler);
     app.post('/send', (req: Request, res: Response) => {
         res.status(200).json({ message: 'Validation passed' });
     });

@@ -1,7 +1,8 @@
 import express, { Request, Response } from 'express';
 import request from 'supertest';
 import { apiKeyAuth } from '../../middlewares/auth/apiKeyAuth';
-import { errorHandler } from '../../middlewares/errorHandler';
+import { mockErrorHandler } from '../testUtilities/mockErrorHandler';
+
 
 // Mock the config for API key
 jest.mock('../../config/env', () => ({
@@ -10,23 +11,18 @@ jest.mock('../../config/env', () => ({
     },
 }));
 
-
 describe('API Key Authentication Middleware Integration Tests', () => {
-    let app: express.Application;
+    const app = express();
+    app.use(apiKeyAuth);
+    app.use(mockErrorHandler);
 
-    // Setup a simple Express app with the apiKeyAuth middleware
-    beforeAll(() => {
-        app = express();
-        app.use(apiKeyAuth);
-        app.use(errorHandler);
-        // Route that uses the apiKeyAuth middleware
-        app.get('/test', (req: Request, res: Response) => {
-            res.status(200).json({ message: 'Access granted' });
-        });
-    });
+    app.get('/test', (req: Request, res: Response) => {
+        res.status(200).json({ message: 'Access granted' });
+    });   
+
 
     afterEach(() => {
-        jest.clearAllMocks(); // Clear any previous mocks between tests
+        jest.clearAllMocks();
     });
 
     // Use-case 1: Valid API key in the first position
@@ -55,7 +51,7 @@ describe('API Key Authentication Middleware Integration Tests', () => {
             .get('/test');
 
         expect(response.status).toBe(401);
-        expect(response.body.message).toBe('Unauthorized access.');
+        expect(response.body.message).toBe('Unauthorized Access: invalid API key.');
     });
 
     // Use-case 4: Invalid API key
@@ -65,6 +61,6 @@ describe('API Key Authentication Middleware Integration Tests', () => {
             .set('x-api-key', 'invalid-api-key');
 
         expect(response.status).toBe(401);
-        expect(response.body.message).toBe('Unauthorized access.');
+        expect(response.body.message).toBe('Unauthorized Access: invalid API key.');
     });
 });

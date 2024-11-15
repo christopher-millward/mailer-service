@@ -2,19 +2,19 @@ import express, { Express, Request, Response } from 'express';
 import { authHandler } from '../../middlewares/auth/authHandler';
 import { apiKeyAuth } from '../../middlewares/auth/apiKeyAuth';
 import { corsPolicy } from '../../middlewares/auth/corsPolicy';
+import { mockErrorHandler } from '../testUtilities/mockErrorHandler';
 import request from 'supertest';
-import { errorHandler } from '../../middlewares/errorHandler';
 
 
 jest.mock('../../middlewares/auth/apiKeyAuth');
-jest.mock('../../middlewares/auth/corsConfig');
+jest.mock('../../middlewares/auth/corsPolicy');
 
 // Helper function to create the test app
 const mockApp = () => {
     const app: Express = express();
     app.use(express.json());
     app.use(authHandler);
-    app.use(errorHandler);
+    app.use(mockErrorHandler);
     app.post('/test', (req: Request, res: Response) => {
         res.status(200).json({ message: 'Success' });
     });
