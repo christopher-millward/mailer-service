@@ -15,14 +15,12 @@ export const createLogger = (logLevel: string) => {
             timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
             printf(({ timestamp, level, message }) => {
                 return `${timestamp} ${level}: ${message}`;
-            })
-            // Uncomment for colorizing console log in development
-            // ,winston.format.colorize({all: true})
+            }),
+            winston.format.colorize({all: true})
         ),
         transports: [
             new winston.transports.File({ filename: logFilePath }),
-            // Uncomment for console logging in development
-            // new winston.transports.Console()
+            new winston.transports.Console()    // Log in console to accomodate for Serverless instances.
         ],
     });
 };
