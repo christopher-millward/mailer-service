@@ -16,16 +16,16 @@ const mockApp = () => {
 };
 
 // Define all valid/ invalid fields
-const validEmail = 'test@example.com';
-const invalidEmail = 'invalid-email';
-const validEmailArray = [validEmail];
-const invalidEmailArray = [invalidEmail];
-const validEmails = [validEmail, 'test2@example.com'];
-const mixedEmails = [validEmail, invalidEmail];
-const invalidEmails = [invalidEmail, invalidEmail];
-const validText = 'Valid text';
-const emptyField = '';
-const missingField = undefined;
+const validEmail: string = 'test@example.com';
+const invalidEmail: string = 'invalid-email';
+const validEmailArray: string[] = [validEmail];
+const invalidEmailArray: string[] = [invalidEmail];
+const validEmails: string[] = [validEmail, 'test2@example.com'];
+const mixedEmails: string[] = [validEmail, invalidEmail];
+const invalidEmails: string[] = [invalidEmail, invalidEmail];
+const validText: string = 'Valid text';
+const emptyField: string = '';
+const missingField: undefined = undefined;
 
 // Interface to allow fields to be deleted and improperly formatted. Mimics the MailOptions schema.
 interface MockOptions {
@@ -357,7 +357,7 @@ describe('validate text field', () => {
         }, 
         {
             input: {text: emptyField},
-            expected_status: 200,
+            expected_status: 400,
             desc: 'Should invalidate invalid empty text field'
         },
         {

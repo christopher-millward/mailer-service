@@ -14,14 +14,14 @@ import { ResponseError } from '../../types/responseError';
  */
 export const mailOptionsValidationRules: ValidationChain[] = [
 // Validate Sender email address
-check('from').notEmpty().isEmail().withMessage('Invalid sender email address'),
+check('from').isString().notEmpty().isEmail().withMessage('Invalid sender email address'),
 
 // Ensure 'to' is an array of valid email addresses
 check('to').isArray().withMessage('To must be an array of email addresses'),
 check('to.*').isEmail().withMessage('Invalid email address in To field'),
 
 // Validate subject
-check('subject').notEmpty().withMessage('Subject cannot be empty'),
+check('subject').isString().notEmpty().withMessage('Subject cannot be empty'),
 
 // Ensure 'cc' is an optional array of valid email addresses
 check('cc').optional().isArray().withMessage('Cc must be an array of email addresses'),
@@ -32,13 +32,14 @@ check('bcc').optional().isArray().withMessage('Bcc must be an array of email add
 check('bcc.*').optional().isEmail().withMessage('Invalid email address in Bcc field'),
 
 // Validate optional text
-check('text').optional().notEmpty().withMessage('Message cannot be empty'),
+check('text').optional().isString().notEmpty().withMessage('Message cannot be empty'),
 
 // Validate optional html
-check('html').optional().notEmpty().withMessage('html cannot be empty'),
+check('html').optional().isString().notEmpty().withMessage('html cannot be empty'),
 
 // Validate optional attachments array
 check('attachments').optional().isArray().withMessage('Attachments must be an array of objects'),
+// individual attachment validation is handled in 'attachmentValidation.ts'
 
 // Ensure that only one of `text` and `html` is present
 check('text').custom((value, { req }) => {
