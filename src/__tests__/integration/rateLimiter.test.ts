@@ -10,7 +10,7 @@ const mockApp = () => {
     app.use(express.json());
     app.use(rateLimiter);
     app.use(mockErrorHandler);
-    config.environment === 'test' ? app.set('trust proxy', true): null; // allow for detection of XFF header in testing
+    config.environment === 'development' ? app.set('trust proxy', true): null; // allow for detection of XFF header in testing
     app.post('/send', (req: Request, res: Response) => {
         res.status(200).json({ message: 'Email sent' });
     });
