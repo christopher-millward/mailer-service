@@ -25,7 +25,7 @@ export const corsOptions: CorsOptions = {
         } else {
             // Block requests from untrusted origins.
             const error: ResponseError = new Error("Unauthorized Access: untrusted origin");
-            error.status = 502;
+            error.status = 403;
             callback(error, false);
         }
     },

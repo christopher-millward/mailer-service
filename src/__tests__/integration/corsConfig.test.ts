@@ -53,7 +53,7 @@ describe('CORS Middleware', () => {
             .set('Origin', 'https://invalid-origin.com');
 
         expect(response.status).toBe(403);
-        expect(response.body.message).toBe('Blocked by CORS policy.');
+        expect(response.body.message).toBe('Unauthorized Access: untrusted origin');
     });
 
     // Use-case 4: No Origin Header
