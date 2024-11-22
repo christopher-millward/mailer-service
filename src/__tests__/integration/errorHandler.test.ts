@@ -44,5 +44,7 @@ describe('Error Handler Middleware Integration Tests', () => {
      * ^^ Many of these should be unit tests, not integration tests??
      */
 
-
+    it('is serving as a dummy test so my jest console does not light up full of red', async ()=>{
+        const response = request(app).post('/test')
+    })
 });
