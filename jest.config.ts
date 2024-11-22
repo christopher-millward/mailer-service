@@ -5,7 +5,7 @@ const config: Config = {
     transform: {
         '^.+\\.tsx?$': 'ts-jest',
     },
-    testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.tsx?$',
+    testRegex: '(/__tests__/.*|.*\/)(test)\.tsx?$',  // Update regex to include '.test'
     moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
     verbose: true,
 };
