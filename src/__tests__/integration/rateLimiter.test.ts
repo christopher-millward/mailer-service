@@ -17,14 +17,28 @@ const mockApp = () => {
     return app;
 };
 
+const suppressProxyError = () => {
+    const originalConsoleError = console.error; // Save the original implementation
+    jest.spyOn(console, 'error').mockImplementation((message, ...args) => {
+        if (message.code == 'ERR_ERL_PERMISSIVE_TRUST_PROXY') {
+            return; // supress error
+        }
+        // Log all others
+        originalConsoleError(message, ...args);
+    });
+};
+
+
 describe('Rate Limiter Middleware Integration Tests', () => {
     let app: Express;
     // Make sure these are the same as the rateLimiter
     const windowMS: number = 15*60*1000;    // limit window (in ms)
     const max_requests: number = 100;       // max number of requests allowed within window
     const less_than_max: number = 5;        // a small number that's 1 < x < max_requests (for simulating multiple good reqs)
+    
     beforeAll(() => {
         app = mockApp();
+        suppressProxyError();
     });
 
     beforeEach(() => {
