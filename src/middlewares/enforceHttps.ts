@@ -13,8 +13,12 @@ export const enforceHttps = (req: Request, res: Response, next: NextFunction) =>
     const isHttps: boolean = req.secure || req.headers['X-Forwarded-Proto'] ==='https'// if secure or if behind proxy.
     const isDevelopment = config.environment=='development' && req.headers.host?.includes('localhost');
 
-    if (!isHttps){
-        isDevelopment ? next(): res.redirect(`https://${req.headers.host}${req.url}`); // Redirect to HTTPS
+    if (!isHttps) {
+        if (isDevelopment) {
+            return next();
+        } else {
+            return res.redirect(`https://${req.headers.host}${req.url}`); // Redirect to HTTPS
+        }
     }
 
     next();
