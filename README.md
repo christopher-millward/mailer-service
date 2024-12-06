@@ -2,7 +2,7 @@
 
 ## General Overview
 
-This is a lightweight email-sending service built with TypeScript, Node.js, and Express. It uses the `nodemailer` library and the SMTP protocol to handle secure, automated email sending. The purpose of this service is to provide a reliable API endpoint that allows developers to automate email workflows in their applications. 
+This is a lightweight email-sending service built with TypeScript, Node.js, and Express. It uses the `nodemailer` library and the SMTP protocol to handle secure, automated email sending. The purpose of this service is to provide an API endpoint that allows developers to automate email workflows in their applications. 
 
 For example, if a user creates a custom intake form, this endpoint can be reached to send a confirmation email to the form's submitter upon form submission.
 
