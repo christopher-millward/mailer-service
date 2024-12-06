@@ -70,7 +70,7 @@ Note: remember to always test code before (and during) production.
 ## Environment Configuration
 
 ### Required `.env` Variables
-To run the application, create a `.env` file in the root directory and include the following environment variables:
+Many of the configuration variables are stored as environment variables. The following variables must be included in order for the app to run:
 
 ```plaintext
 SMTP_HOST           # SMTP server address
@@ -123,3 +123,4 @@ Note:
 ## Lisence
 
 ## Contact
+This project was built independently by Christopher Millward. If you have any questions, please feel free to reach out at cmillwar@uwo.ca.
