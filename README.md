@@ -106,21 +106,9 @@ Note:
 
 ---
 
-## Running Locally
-
----
-
-## Testing
-[use of Jest]
-- make sure no PII is inside test_certs
-
----
-
-## Deployment
-
-## Error Handling
-
 ## Lisence
+
+---
 
 ## Contact
 This project was built independently by Christopher Millward. If you have any questions, please feel free to reach out at cmillwar@uwo.ca.
