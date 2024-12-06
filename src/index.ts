@@ -31,7 +31,7 @@ app.use(enforceHttps);
 app.use(errorHandler);  // Must be last!
 
 // Route Setup
-app.use('/mail', mailRoutes);
+app.use('/mailer', mailRoutes);
 
 // Start Server
 app.listen(PORT, () => {
