@@ -14,10 +14,11 @@ import { MailOptions } from '../../schema/mailOptions';
  */
 export const baseLogger = (req: Request, res: Response, next: NextFunction, logLevel: string, additionalMessage: string = '') => {
     const startTime = Date.now();
-    const emailDetails: MailOptions = req.body;
 
     res.on('finish', () => {
+        const emailDetails: MailOptions = req.body;
         const duration = Date.now() - startTime;
+
         const logMessage = [
             `[Request ID: ${req.id}]`,                      // unique ID
             `Method: ${req.method}`,                        // method
@@ -31,7 +32,6 @@ export const baseLogger = (req: Request, res: Response, next: NextFunction, logL
             `Sender Email: ${emailDetails.from}`,           // sender email
             `Recipient emails: ${emailDetails.to}`,         // recipient email
             `Email subject line: ${emailDetails.subject}`,  // subject line
-            // `Response Message: ${responseBody}`,            // response message
             additionalMessage                               // additional log message
         ].join(' | ');
 
