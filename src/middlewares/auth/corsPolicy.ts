@@ -10,13 +10,14 @@ import { corsOptions } from '../../config/corsOptions';
  * @param {Request} req - Express request object.
  * @param {Response} res - Express response object.
  * @param {NextFunction} next - Express next middleware function.
- * @returns {void | Response} Calls the next middleware function or sends a 403 error response.
+ * @returns {void} Calls the next middleware function.
  */
-export const corsPolicy = (req: Request, res: Response, next: NextFunction): void | Response=> {
+export const corsPolicy = (req: Request, res: Response, next: NextFunction): void=> {
 
     // Handle preflight requests
     if (req.method === 'OPTIONS') {
-        return handlePreflightRequest(req, res, next, corsOptions);
+        handlePreflightRequest(req, res, next, corsOptions);
+        return
     }
 
     // Apply cors with specified options.
